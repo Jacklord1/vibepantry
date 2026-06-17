@@ -3,6 +3,7 @@ import { CATEGORIES, DEFAULT_CATEGORY } from './categories'
 import { callMessages } from './anthropic'
 import { downscaleToBase64 } from './image'
 import { extractJsonObject } from './json'
+import { uuid } from './id'
 
 // Vision extraction — the hero call. One image per request, returns an array
 // of items (multi-item per photo is the point; a single item or a nutrition
@@ -122,7 +123,7 @@ export async function extractItemsFromPhoto(
   const raw = parseVisionResponse(text)
   const now = new Date().toISOString()
   return raw.map((r) => ({
-    id: crypto.randomUUID(),
+    id: uuid(),
     name: r.name,
     quantity: r.quantity,
     category: r.category,

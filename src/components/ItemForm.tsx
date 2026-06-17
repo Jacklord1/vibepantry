@@ -8,6 +8,8 @@ export type ItemFormValues = {
   name: string
   quantity: string
   category: Category
+  /** ISO date (yyyy-mm-dd) or '' for none. */
+  expiry: string
 }
 
 type Props = {
@@ -28,6 +30,7 @@ export function ItemForm({
   const [category, setCategory] = useState<Category>(
     initial?.category ?? DEFAULT_CATEGORY,
   )
+  const [expiry, setExpiry] = useState(initial?.expiry ?? '')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
 
@@ -45,6 +48,7 @@ export function ItemForm({
         name: trimmed,
         quantity: quantity.trim(),
         category,
+        expiry,
       })
     } finally {
       setSaving(false)
@@ -92,6 +96,18 @@ export function ItemForm({
             </option>
           ))}
         </select>
+      </label>
+
+      <label className={styles.field}>
+        <span className={styles.label}>
+          Expiry <span className={styles.optional}>· optional</span>
+        </span>
+        <input
+          className={styles.input}
+          type="date"
+          value={expiry}
+          onChange={(e) => setExpiry(e.target.value)}
+        />
       </label>
 
       {error && (

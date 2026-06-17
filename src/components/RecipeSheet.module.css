@@ -32,6 +32,13 @@
   color: var(--c-accent);
 }
 
+.macros {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--c-text);
+}
+
 .uses {
   font-size: var(--fs-sm);
   color: var(--c-herb);
@@ -137,6 +144,9 @@
     color: #333;
   }
   .meta {
+    color: #000;
+  }
+  .macros {
     color: #000;
   }
   .uses {

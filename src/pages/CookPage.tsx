@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { PantryItem, Recipe } from '../types'
-import { getAllItems, getAllRecipes, getSetting, saveRecipes } from '../db'
-import { API_KEY_SETTING } from '../lib/anthropic'
+import { getAllItems, getAllRecipes, saveRecipes } from '../db'
+import { hasApiAccess } from '../lib/anthropic'
 import { generateRecipes, VIBES } from '../lib/recipes'
 import type { Vibe } from '../lib/recipes'
+import { expiringItems } from '../lib/expiry'
 import { PageHeader } from '../components/PageHeader'
 import { RecipeCard } from '../components/RecipeCard'
 import { IconAdd, IconCamera, IconCook } from '../components/Icons'
@@ -36,18 +37,20 @@ export function CookPage() {
 
   const [hero, setHero] = useState<string>(SURPRISE)
   const [vibe, setVibe] = useState<Vibe>('fast')
+  const [macros, setMacros] = useState(false)
+  const [useExpiring, setUseExpiring] = useState(false)
   const [phase, setPhase] = useState<'prefs' | 'cooking' | 'options'>('prefs')
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     void (async () => {
-      const [key, all, recs] = await Promise.all([
-        getSetting(API_KEY_SETTING),
+      const [access, all, recs] = await Promise.all([
+        hasApiAccess(),
         getAllItems(),
         getAllRecipes(),
       ])
-      setGated(!key)
+      setGated(!access)
       setItems(all.filter((i) => i.confirmed))
       setHistory(sortHistory(recs))
     })()
@@ -55,17 +58,19 @@ export function CookPage() {
 
   async function cook() {
     if (!items) return
-    const key = await getSetting(API_KEY_SETTING)
-    if (!key) {
+    if (!(await hasApiAccess())) {
       setGated(true)
       return
     }
     setError(null)
     setPhase('cooking')
     try {
+      const soonNames = expiringItems(items).map((s) => s.item.name)
       const recs = await generateRecipes(items, {
         hero: hero === SURPRISE ? null : hero,
         vibe,
+        macros,
+        useSoon: useExpiring ? soonNames : undefined,
       })
       await saveRecipes(recs)
       setRecipes(recs)
@@ -155,6 +160,7 @@ export function CookPage() {
   }
 
   const heroes = heroCandidates(items)
+  const soonCount = expiringItems(items).length
 
   return (
     <>
@@ -199,6 +205,21 @@ export function CookPage() {
         </div>
       </section>
 
+      <section className={styles.q}>
+        <Toggle
+          label="High protein + macros"
+          on={macros}
+          onChange={() => setMacros((m) => !m)}
+        />
+        {soonCount > 0 && (
+          <Toggle
+            label={`Cook what’s expiring (${soonCount})`}
+            on={useExpiring}
+            onChange={() => setUseExpiring((u) => !u)}
+          />
+        )}
+      </section>
+
       {error && (
         <p className={styles.error} role="alert">
           {error}
@@ -237,5 +258,30 @@ export function CookPage() {
 function sortHistory(recs: Recipe[]): Recipe[] {
   return [...recs].sort((a, b) =>
     (b.createdAt ?? '').localeCompare(a.createdAt ?? ''),
+  )
+}
+
+function Toggle({
+  label,
+  on,
+  onChange,
+}: {
+  label: string
+  on: boolean
+  onChange: () => void
+}) {
+  return (
+    <div className={styles.toggleRow}>
+      <span className={styles.toggleLabel}>{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        className={`${styles.switch} ${on ? styles.switchOn : ''}`}
+        onClick={onChange}
+      >
+        <span className={styles.knob} />
+      </button>
+    </div>
   )
 }

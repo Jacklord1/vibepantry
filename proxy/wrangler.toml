@@ -1,0 +1,10 @@
+name = "vibepantry-proxy"
+main = "worker.js"
+compatibility_date = "2026-06-01"
+
+# Your Anthropic key is a SECRET — never put it here. Set it with:
+#   wrangler secret put ANTHROPIC_API_KEY
+#
+# Optional: lock the proxy to your app's origin so nobody else can use your key.
+# [vars]
+# ALLOWED_ORIGIN = "https://your-vibepantry-host.example"

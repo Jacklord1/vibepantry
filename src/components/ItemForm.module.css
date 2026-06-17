@@ -16,6 +16,11 @@
   color: var(--c-text-muted);
 }
 
+.optional {
+  font-weight: var(--fw-body);
+  color: var(--c-text-faint);
+}
+
 .input {
   width: 100%;
   padding: var(--sp-3) var(--sp-4);

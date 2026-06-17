@@ -40,6 +40,21 @@
   color: var(--c-accent);
 }
 
+.macros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  color: var(--c-text-muted);
+}
+
+.kcal {
+  color: var(--c-text);
+  font-weight: var(--fw-semibold);
+}
+
 .uses,
 .missing {
   margin-top: var(--sp-2);
@@ -79,4 +94,11 @@
   border: 1px solid var(--c-border);
   padding: 2px var(--sp-2);
   border-radius: var(--r-pill);
+}
+
+.tagHi {
+  color: var(--c-herb);
+  background: var(--c-herb-soft);
+  border-color: color-mix(in srgb, var(--c-herb) 40%, transparent);
+  font-weight: var(--fw-semibold);
 }

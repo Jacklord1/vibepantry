@@ -8,6 +8,18 @@ export const MODEL = 'claude-sonnet-4-6'
 const ENDPOINT = 'https://api.anthropic.com/v1/messages'
 const ANTHROPIC_VERSION = '2023-06-01'
 export const API_KEY_SETTING = 'apiKey'
+/** Optional custom endpoint (the proxy Worker URL). When set, the app POSTs
+ *  here instead of api.anthropic.com and the key may be left blank. */
+export const API_BASE_SETTING = 'apiEndpoint'
+
+/** True if the app can make calls: a key OR a custom (proxy) endpoint is set. */
+export async function hasApiAccess(): Promise<boolean> {
+  const [key, base] = await Promise.all([
+    getSetting(API_KEY_SETTING),
+    getSetting(API_BASE_SETTING),
+  ])
+  return !!(key || base)
+}
 
 export type TextBlock = { type: 'text'; text: string }
 export type ImageBlock = {
@@ -77,19 +89,27 @@ export async function callMessages({
   messages,
   maxTokens = 3000,
 }: CallArgs): Promise<string> {
-  const apiKey = await getSetting(API_KEY_SETTING)
-  if (!apiKey) throw new MissingApiKeyError()
+  const [apiKey, apiBase] = await Promise.all([
+    getSetting(API_KEY_SETTING),
+    getSetting(API_BASE_SETTING),
+  ])
+  if (!apiKey && !apiBase) throw new MissingApiKeyError()
+
+  // Direct to Anthropic by default; to the proxy endpoint when one is set.
+  const endpoint = apiBase || ENDPOINT
+  const headers: Record<string, string> = {
+    'content-type': 'application/json',
+    'anthropic-version': ANTHROPIC_VERSION,
+    'anthropic-dangerous-direct-browser-access': 'true',
+  }
+  // Omit the key in proxy mode — the Worker injects it server-side.
+  if (apiKey) headers['x-api-key'] = apiKey
 
   let res: Response
   try {
-    res = await fetch(ENDPOINT, {
+    res = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': ANTHROPIC_VERSION,
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
+      headers,
       body: JSON.stringify({
         model: MODEL,
         max_tokens: maxTokens,

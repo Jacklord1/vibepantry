@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { PantryItem } from '../types'
-import { getSetting, putItem } from '../db'
-import { API_KEY_SETTING, MissingApiKeyError } from '../lib/anthropic'
+import { putItem } from '../db'
+import { hasApiAccess, MissingApiKeyError } from '../lib/anthropic'
 import { extractItemsFromPhoto } from '../lib/vision'
+import { uuid } from '../lib/id'
 import { PageHeader } from '../components/PageHeader'
 import { ReviewGrid } from '../components/ReviewGrid'
 import type { RowPatch } from '../components/ReviewGrid'
@@ -71,8 +72,7 @@ export function SnapPage() {
 
   useEffect(() => {
     void (async () => {
-      const key = await getSetting(API_KEY_SETTING)
-      setGated(!key)
+      setGated(!(await hasApiAccess()))
     })()
   }, [])
 
@@ -92,7 +92,7 @@ export function SnapPage() {
       if (!file.type.startsWith('image/')) continue
       const thumbUrl = URL.createObjectURL(file)
       urlsRef.current.push(thumbUrl)
-      next.push({ id: crypto.randomUUID(), file, thumbUrl, status: 'queued' })
+      next.push({ id: uuid(), file, thumbUrl, status: 'queued' })
     }
     if (next.length) setPhotos((ps) => [...ps, ...next])
   }
@@ -111,8 +111,7 @@ export function SnapPage() {
 
   async function readPhotos() {
     if (reading) return
-    const key = await getSetting(API_KEY_SETTING)
-    if (!key) {
+    if (!(await hasApiAccess())) {
       setGated(true)
       return
     }

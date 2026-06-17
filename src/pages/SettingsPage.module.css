@@ -11,6 +11,23 @@
   margin-bottom: var(--sp-2);
 }
 
+.summary {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-display);
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: var(--sp-3);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] .summary {
+  margin-bottom: var(--sp-3);
+}
+
 .note {
   font-size: var(--fs-sm);
   color: var(--c-text-muted);

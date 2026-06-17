@@ -1,16 +1,21 @@
-import type { PantryItem, Recipe } from '../types'
+import type { Macros, PantryItem, Recipe } from '../types'
 import { callMessages } from './anthropic'
 import { extractJsonObject } from './json'
+import { uuid } from './id'
 
 // Recipe generation — the loop's payoff. One text call: confirmed pantry +
-// 1–2 preference taps -> 2–3 recipes makeable mostly from stock. Contract is
-// LOCKED in SPEC.md. (Macros stay null in Phase 3; the macros layer is Phase 4.)
+// preference taps -> 2–3 recipes makeable mostly from stock. Contract is LOCKED
+// in SPEC.md. Phase 4 turns on the macros flag + a "use what's expiring" bias.
 
 export type Vibe = 'fast' | 'clean' | 'comfort'
 export type RecipePrefs = {
   /** A pantry item name to star, or null for "surprise me". */
   hero: string | null
   vibe: Vibe
+  /** Show macros per serving + lean high-protein. */
+  macros: boolean
+  /** Names of soon-to-expire items to prioritise (optional). */
+  useSoon?: string[]
 }
 
 export const VIBES: { value: Vibe; label: string }[] = [
@@ -19,7 +24,11 @@ export const VIBES: { value: Vibe; label: string }[] = [
   { value: 'comfort', label: 'Comfort' },
 ]
 
-export const RECIPE_SYSTEM = `You are a practical, resourceful home cook. You are given the user's current pantry (item names with rough quantities) and 1–2 preferences. Propose 2–3 recipes they can make MOSTLY from what they already have.
+function recipeSystem(macros: boolean): string {
+  const macroRule = macros
+    ? `- The user wants macros: set "macrosPerServing" to a best-estimate object { "kcal": number, "protein_g": number, "carbs_g": number, "fat_g": number } per serving. Lean toward higher-protein recipes and add a "high-protein" tag where it genuinely fits. Where a pantry item lists per-100g macros, use them to sharpen your estimate.`
+    : `- Set "macrosPerServing" to null.`
+  return `You are a practical, resourceful home cook. You are given the user's current pantry (item names with rough quantities, sometimes per-100g macros) and a few preferences. Propose 2–3 recipes they can make MOSTLY from what they already have.
 
 Return ONLY a JSON object of this exact shape — no prose, no explanation, no markdown code fences:
 { "recipes": [ {
@@ -44,8 +53,11 @@ Rules:
   - fast = quick, minimal steps, weeknight.
   - clean = lighter, fresh, whole-food leaning.
   - comfort = hearty, cosy, satisfying.
-- Keep "steps" concise and in order. Set "macrosPerServing" to null.
+- If asked to prioritise soon-to-expire items, make sure most recipes use them.
+- Keep "steps" concise and in order.
+${macroRule}
 - Return only the JSON object.`
+}
 
 /** Thrown when the model's text can't be parsed into the locked shape. */
 export class RecipeParseError extends Error {
@@ -86,6 +98,21 @@ function ingredients(v: unknown): { name: string; amount: string }[] {
   return out
 }
 
+/** Keep macrosPerServing only when all four values are finite numbers. */
+function macrosPerServing(v: unknown): Recipe['macrosPerServing'] {
+  if (typeof v !== 'object' || v === null) return null
+  const o = v as Record<string, unknown>
+  const n = (k: string) =>
+    typeof o[k] === 'number' && Number.isFinite(o[k]) ? (o[k] as number) : null
+  const kcal = n('kcal')
+  const protein_g = n('protein_g')
+  const carbs_g = n('carbs_g')
+  const fat_g = n('fat_g')
+  if (kcal === null || protein_g === null || carbs_g === null || fat_g === null)
+    return null
+  return { kcal, protein_g, carbs_g, fat_g }
+}
+
 /** Defensive parse of the recipe response. Throws RecipeParseError on failure. */
 export function parseRecipesResponse(text: string): RawRecipe[] {
   let parsed: unknown
@@ -113,7 +140,7 @@ export function parseRecipesResponse(text: string): RawRecipe[] {
       timeMinutes: num(o.timeMinutes, 30),
       ingredients: ingredients(o.ingredients),
       steps: strArray(o.steps),
-      macrosPerServing: null,
+      macrosPerServing: macrosPerServing(o.macrosPerServing),
       tags: strArray(o.tags),
     })
   }
@@ -121,9 +148,22 @@ export function parseRecipesResponse(text: string): RawRecipe[] {
   return out
 }
 
+function formatItemMacros(m: Macros): string {
+  const parts: string[] = []
+  if (typeof m.kcal === 'number') parts.push(`${m.kcal}kcal`)
+  if (typeof m.protein_g === 'number') parts.push(`P${m.protein_g}`)
+  if (typeof m.carbs_g === 'number') parts.push(`C${m.carbs_g}`)
+  if (typeof m.fat_g === 'number') parts.push(`F${m.fat_g}`)
+  return parts.length ? ` [per 100g: ${parts.join(' ')}]` : ''
+}
+
 function pantryList(pantry: PantryItem[]): string {
   return pantry
-    .map((i) => `- ${i.name}${i.quantity ? ` (${i.quantity})` : ''}`)
+    .map((i) => {
+      const qty = i.quantity ? ` (${i.quantity})` : ''
+      const macros = i.macros ? formatItemMacros(i.macros) : ''
+      return `- ${i.name}${qty}${macros}`
+    })
     .join('\n')
 }
 
@@ -139,11 +179,15 @@ export async function generateRecipes(
     `My pantry:\n${pantryList(pantry)}\n\n` +
     `Preferences:\n` +
     `- Hero ingredient: ${prefs.hero ?? "cook's choice (surprise me)"}\n` +
-    `- Vibe: ${prefs.vibe}\n\n` +
-    `Give me 2–3 recipes I can cook mostly from this.`
+    `- Vibe: ${prefs.vibe}\n` +
+    (prefs.macros ? `- Show macros per serving and lean high-protein.\n` : '') +
+    (prefs.useSoon && prefs.useSoon.length
+      ? `- Prioritise using these soon-to-expire items: ${prefs.useSoon.join(', ')}.\n`
+      : '') +
+    `\nGive me 2–3 recipes I can cook mostly from this.`
 
   const text = await callMessages({
-    system: RECIPE_SYSTEM,
+    system: recipeSystem(prefs.macros),
     // 2–3 full recipes (ingredients + steps) blow past ~1500 and truncate the
     // JSON mid-array (verified). 3000 gives headroom like the vision call.
     maxTokens: 3000,
@@ -153,7 +197,7 @@ export async function generateRecipes(
   const now = new Date().toISOString()
   return parseRecipesResponse(text).map((r) => ({
     ...r,
-    id: crypto.randomUUID(),
+    id: uuid(),
     createdAt: now,
   }))
 }

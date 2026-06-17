@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import type { PantryItem } from '../types'
 import { getItem, putItem } from '../db'
+import { uuid } from '../lib/id'
 import { ItemForm } from '../components/ItemForm'
 import type { ItemFormValues } from '../components/ItemForm'
 import { PageHeader } from '../components/PageHeader'
@@ -34,11 +35,17 @@ export function ItemEditorPage() {
   }, [id])
 
   async function handleSubmit(values: ItemFormValues) {
+    const base = {
+      name: values.name,
+      quantity: values.quantity,
+      category: values.category,
+      expiry: values.expiry || null,
+    }
     const item: PantryItem = existing
-      ? { ...existing, ...values }
+      ? { ...existing, ...base }
       : {
-          id: crypto.randomUUID(),
-          ...values,
+          id: uuid(),
+          ...base,
           addedAt: new Date().toISOString(),
           confirmed: true,
         }
@@ -86,7 +93,16 @@ export function ItemEditorPage() {
       )}
 
       <ItemForm
-        initial={existing ?? undefined}
+        initial={
+          existing
+            ? {
+                name: existing.name,
+                quantity: existing.quantity,
+                category: existing.category,
+                expiry: existing.expiry ?? '',
+              }
+            : undefined
+        }
         submitLabel={isEdit ? 'Save changes' : 'Add to pantry'}
         onSubmit={handleSubmit}
         onCancel={() => navigate('/')}

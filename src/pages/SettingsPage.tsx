@@ -11,6 +11,7 @@ import { IconDownload, IconUpload } from '../components/Icons'
 import styles from './SettingsPage.module.css'
 
 const API_KEY = 'apiKey'
+const API_ENDPOINT = 'apiEndpoint'
 
 type Notice = { kind: 'ok' | 'error'; text: string } | null
 
@@ -26,16 +27,51 @@ export function SettingsPage() {
   const [keyNotice, setKeyNotice] = useState<Notice>(null)
   const [dataNotice, setDataNotice] = useState<Notice>(null)
   const [loaded, setLoaded] = useState(false)
+  const [savedEndpoint, setSavedEndpoint] = useState<string | null>(null)
+  const [endpointInput, setEndpointInput] = useState('')
+  const [endpointNotice, setEndpointNotice] = useState<Notice>(null)
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     void (async () => {
-      const key = await getSetting(API_KEY)
+      const [key, endpoint] = await Promise.all([
+        getSetting(API_KEY),
+        getSetting(API_ENDPOINT),
+      ])
       setSavedKey(key ?? null)
       setEditing(!key) // open the input when nothing is set yet
+      setSavedEndpoint(endpoint ?? null)
+      setEndpointInput(endpoint ?? '')
       setLoaded(true)
     })()
   }, [])
+
+  async function saveEndpoint() {
+    const trimmed = endpointInput.trim()
+    if (trimmed && !/^https?:\/\//i.test(trimmed)) {
+      setEndpointNotice({ kind: 'error', text: 'Enter a full https:// URL.' })
+      return
+    }
+    if (!trimmed) {
+      await deleteSetting(API_ENDPOINT)
+      setSavedEndpoint(null)
+      setEndpointNotice({ kind: 'ok', text: 'Endpoint cleared — calling Anthropic directly.' })
+      return
+    }
+    await setSetting(API_ENDPOINT, trimmed)
+    setSavedEndpoint(trimmed)
+    setEndpointNotice({ kind: 'ok', text: 'Endpoint saved — calls go through your proxy.' })
+  }
+
+  async function clearEndpoint() {
+    await deleteSetting(API_ENDPOINT)
+    setSavedEndpoint(null)
+    setEndpointInput('')
+    setEndpointNotice({
+      kind: 'ok',
+      text: 'Endpoint cleared — calling Anthropic directly.',
+    })
+  }
 
   async function saveKey() {
     const trimmed = keyInput.trim()
@@ -206,6 +242,47 @@ export function SettingsPage() {
           </p>
         )}
       </section>
+
+      {/* ---- Advanced: optional proxy endpoint ---- */}
+      <details className={styles.section}>
+        <summary className={styles.summary}>
+          Advanced — custom API endpoint{savedEndpoint ? ' (active)' : ''}
+        </summary>
+        <p className={styles.note}>
+          Running the optional <code>proxy/</code> Cloudflare Worker to keep your
+          key server-side? Paste its URL here — the app POSTs there instead of{' '}
+          <code>api.anthropic.com</code>, and you can leave the API key blank.
+          Leave this empty to call Anthropic directly (the default).
+        </p>
+        <input
+          className={styles.input}
+          type="url"
+          inputMode="url"
+          value={endpointInput}
+          onChange={(e) => setEndpointInput(e.target.value)}
+          placeholder="https://your-worker.workers.dev"
+          autoComplete="off"
+          spellCheck={false}
+        />
+        <div className={styles.keyActions}>
+          {savedEndpoint && (
+            <button className={styles.danger} onClick={clearEndpoint}>
+              Clear
+            </button>
+          )}
+          <button className={styles.primary} onClick={saveEndpoint}>
+            Save endpoint
+          </button>
+        </div>
+        {endpointNotice && (
+          <p
+            className={endpointNotice.kind === 'ok' ? styles.ok : styles.err}
+            role="status"
+          >
+            {endpointNotice.text}
+          </p>
+        )}
+      </details>
     </>
   )
 }

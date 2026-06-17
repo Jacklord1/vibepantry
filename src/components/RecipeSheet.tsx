@@ -19,6 +19,14 @@ export function RecipeSheet({ recipe }: { recipe: Recipe }) {
             </>
           )}
         </div>
+        {recipe.macrosPerServing && (
+          <p className={styles.macros}>
+            Per serving: {recipe.macrosPerServing.kcal} kcal · protein{' '}
+            {recipe.macrosPerServing.protein_g}g · carbs{' '}
+            {recipe.macrosPerServing.carbs_g}g · fat{' '}
+            {recipe.macrosPerServing.fat_g}g
+          </p>
+        )}
       </header>
 
       {recipe.usesItems.length > 0 && (

@@ -19,6 +19,17 @@ export function RecipeCard({ recipe, onSelect }: Props) {
         <span>serves {recipe.servings}</span>
       </div>
 
+      {recipe.macrosPerServing && (
+        <div className={styles.macros}>
+          <span className={styles.kcal}>
+            {recipe.macrosPerServing.kcal} kcal
+          </span>
+          <span>P {recipe.macrosPerServing.protein_g}g</span>
+          <span>C {recipe.macrosPerServing.carbs_g}g</span>
+          <span>F {recipe.macrosPerServing.fat_g}g</span>
+        </div>
+      )}
+
       {recipe.usesItems.length > 0 && (
         <p className={styles.uses}>
           <span className={styles.usesLabel}>Uses</span>{' '}
@@ -36,7 +47,10 @@ export function RecipeCard({ recipe, onSelect }: Props) {
       {recipe.tags.length > 0 && (
         <div className={styles.tags}>
           {recipe.tags.map((t) => (
-            <span key={t} className={styles.tag}>
+            <span
+              key={t}
+              className={`${styles.tag} ${t === 'high-protein' ? styles.tagHi : ''}`}
+            >
               {t}
             </span>
           ))}
