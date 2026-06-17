@@ -1,7 +1,8 @@
+import type { ReactNode } from 'react'
 import styles from './PageHeader.module.css'
 
 type Props = {
-  title: string
+  title: ReactNode
   subtitle?: string
   /** Larger display treatment for the home wordmark. */
   wordmark?: boolean

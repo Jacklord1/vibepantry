@@ -43,7 +43,11 @@ export function PantryPage() {
     <>
       <div className={styles.top}>
         <PageHeader
-          title="VibePantry"
+          title={
+            <>
+              Vibe<span className={styles.brandTail}>Pantry</span>
+            </>
+          }
           subtitle="What's in your kitchen, ready to cook from."
           wordmark
           wide

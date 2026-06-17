@@ -1,6 +1,10 @@
 # Changelog
 
 ## [feature/responsive-desktop-layout] - 2026-06-17
+- Polish pass. Item and recipe cards lift on hover (desktop pointer devices only) for tactile feedback. The home wordmark renders "Vibe" with an amber "Pantry" (PageHeader's title now accepts rich content). The pantry header (wordmark + Cook/Snap actions) sticks to the top on desktop so the brand and actions stay reachable down a long grid; mobile stays static.
+- Branch: `feature/responsive-desktop-layout`
+
+## [feature/responsive-desktop-layout] - 2026-06-17
 - Live search/filter for the pantry. A search box live-filters items by name or quantity; empty categories drop out and per-category counts reflect matches. Includes a clear (×) button, a "no matches" state, and hides the Use Soon banner/list while a search is active for a focused find mode. Desktop caps the field at 420px (left-aligned); mobile is full-width.
 - Branch: `feature/responsive-desktop-layout`
 

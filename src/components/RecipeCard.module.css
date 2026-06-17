@@ -8,7 +8,8 @@
   border-radius: var(--r-lg);
   transition:
     border-color var(--t-fast),
-    transform var(--t-fast);
+    transform var(--t-fast),
+    box-shadow var(--t-fast);
 }
 
 .card:hover {
@@ -17,6 +18,20 @@
 
 .card:active {
   transform: scale(0.99);
+}
+
+/* Desktop pointer: lift the card on hover for tactile feedback; a press still
+   reads as a downward scale. */
+@media (min-width: 700px) and (hover: hover) {
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+  }
+
+  .card:active {
+    transform: scale(0.99);
+    box-shadow: var(--shadow-1);
+  }
 }
 
 .title {
