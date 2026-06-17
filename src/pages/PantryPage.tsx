@@ -7,15 +7,32 @@ import { PageHeader } from '../components/PageHeader'
 import { CategoryGroup } from '../components/CategoryGroup'
 import { EmptyState } from '../components/EmptyState'
 import { UseSoonBanner, UseSoonList } from '../components/UseSoon'
-import { IconCamera, IconCook } from '../components/Icons'
+import { IconCamera, IconClose, IconCook, IconSearch } from '../components/Icons'
 import styles from './PantryPage.module.css'
 
 export function PantryPage() {
   const navigate = useNavigate()
   const { groups, items, loading, error, refresh } = usePantry()
   const [bannerDismissed, setBannerDismissed] = useState(false)
+  const [query, setQuery] = useState('')
   const soonCount = expiringSoonCount(items)
   const hasItems = !loading && !error && items.length > 0
+
+  // Live filter by name or quantity; drop categories left with no matches.
+  const q = query.trim().toLowerCase()
+  const filteredGroups = q
+    ? groups
+        .map((g) => ({
+          ...g,
+          items: g.items.filter(
+            (i) =>
+              i.name.toLowerCase().includes(q) ||
+              i.quantity.toLowerCase().includes(q),
+          ),
+        }))
+        .filter((g) => g.items.length > 0)
+    : groups
+  const matchCount = filteredGroups.reduce((n, g) => n + g.items.length, 0)
 
   async function handleDelete(id: string) {
     await deleteItem(id)
@@ -55,26 +72,53 @@ export function PantryPage() {
         <EmptyState />
       ) : (
         <>
-          {soonCount > 0 && !bannerDismissed && (
+          <div className={styles.search}>
+            <IconSearch size={18} className={styles.searchIcon} />
+            <input
+              className={styles.searchInput}
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search your pantry…"
+              aria-label="Search your pantry"
+            />
+            {query && (
+              <button
+                className={styles.searchClear}
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+              >
+                <IconClose size={16} />
+              </button>
+            )}
+          </div>
+
+          {!q && soonCount > 0 && !bannerDismissed && (
             <UseSoonBanner
               count={soonCount}
               onDismiss={() => setBannerDismissed(true)}
             />
           )}
 
-          <UseSoonList items={items} onEdit={(id) => navigate(`/edit/${id}`)} />
+          {!q && (
+            <UseSoonList items={items} onEdit={(id) => navigate(`/edit/${id}`)} />
+          )}
 
-          <div className={styles.groups}>
-            {groups.map((g) => (
-              <CategoryGroup
-                key={g.category}
-                label={g.label}
-                items={g.items}
-                onEdit={(id) => navigate(`/edit/${id}`)}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
+          {matchCount === 0 ? (
+            <p className={styles.noMatch}>No items match “{query.trim()}”.</p>
+          ) : (
+            <div className={styles.groups}>
+              {filteredGroups.map((g) => (
+                <CategoryGroup
+                  key={g.category}
+                  label={g.label}
+                  items={g.items}
+                  onEdit={(id) => navigate(`/edit/${id}`)}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
         </>
       )}
     </>

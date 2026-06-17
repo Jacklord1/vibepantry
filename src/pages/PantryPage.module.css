@@ -18,6 +18,70 @@
   flex-direction: column;
 }
 
+/* ---- search ---- */
+.search {
+  position: relative;
+  margin-bottom: var(--sp-5);
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--sp-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--c-text-faint);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-6) var(--sp-3) calc(var(--sp-6) + var(--sp-1));
+  background: var(--c-surface);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  transition: border-color var(--t-fast);
+}
+
+.searchInput::placeholder {
+  color: var(--c-text-faint);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--c-accent);
+}
+
+/* Hide the native clear control — we render our own. */
+.searchInput::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.searchClear {
+  position: absolute;
+  right: var(--sp-2);
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  color: var(--c-text-muted);
+}
+
+.searchClear:hover {
+  color: var(--c-text);
+  background: var(--c-surface-2);
+}
+
+.noMatch {
+  color: var(--c-text-muted);
+  padding: var(--sp-6) var(--sp-2);
+  text-align: center;
+}
+
 .cook {
   display: flex;
   align-items: center;
@@ -91,5 +155,10 @@
     margin: 0;
     padding: var(--sp-3) var(--sp-4);
     white-space: nowrap;
+  }
+
+  /* Keep the search field a tidy, left-aligned width — not a 1040px bar. */
+  .search {
+    max-width: 420px;
   }
 }

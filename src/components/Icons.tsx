@@ -78,6 +78,15 @@ export function IconClose({ size = 22, className }: IconProps) {
   )
 }
 
+export function IconSearch({ size = 18, className }: IconProps) {
+  return (
+    <svg {...svgProps(size)} className={className}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M21 21l-4.35-4.35" />
+    </svg>
+  )
+}
+
 export function IconDownload({ size = 18, className }: IconProps) {
   return (
     <svg {...svgProps(size)} className={className}>
