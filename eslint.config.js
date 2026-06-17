@@ -19,4 +19,16 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Playwright config + E2E specs: Node-side test runner that also drives
+    // page.evaluate() callbacks running in the browser, so allow both global
+    // sets. Not a Fast-Refresh surface.
+    files: ['e2e/**/*.ts', 'playwright.config.ts'],
+    languageOptions: {
+      globals: { ...globals.node, ...globals.browser },
+    },
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])
