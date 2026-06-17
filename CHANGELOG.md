@@ -1,6 +1,9 @@
 # Changelog
 
 ## [feature/responsive-desktop-layout] - 2026-06-17
+- Fix: item card top/bottom-right corners going square on hover — clip the card to its border-radius on desktop so the absolutely-positioned action scrim can't overpaint the rounded corners.
+
+## [feature/responsive-desktop-layout] - 2026-06-17
 - Frosted the desktop sticky header to match the bottom nav (semi-transparent `bg-elev` + `blur(10px)`), so the grid blurs softly underneath and the top/bottom bars read as a matched pair.
 - Branch: `feature/responsive-desktop-layout`
 

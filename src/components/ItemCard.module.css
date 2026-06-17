@@ -68,6 +68,9 @@
 @media (min-width: 700px) and (hover: hover) {
   .card:not(.confirm) {
     position: relative;
+    /* clip the absolutely-positioned action scrim to the card's rounded
+       corners so the right corners don't go square on hover */
+    overflow: hidden;
   }
 
   .card:not(.confirm):hover {
