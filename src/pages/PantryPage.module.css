@@ -145,8 +145,9 @@
     gap: var(--sp-6);
     padding-bottom: var(--sp-4);
     margin-bottom: var(--sp-3);
-    /* solid background so the grid scrolls cleanly underneath the pinned row */
-    background: var(--c-bg);
+    /* frosted bar matching the bottom nav — the grid blurs softly underneath */
+    background: color-mix(in srgb, var(--c-bg-elev) 92%, transparent);
+    backdrop-filter: blur(10px);
   }
 
   /* Drop PageHeader's own bottom margin so the row aligns cleanly. */

@@ -1,6 +1,10 @@
 # Changelog
 
 ## [feature/responsive-desktop-layout] - 2026-06-17
+- Frosted the desktop sticky header to match the bottom nav (semi-transparent `bg-elev` + `blur(10px)`), so the grid blurs softly underneath and the top/bottom bars read as a matched pair.
+- Branch: `feature/responsive-desktop-layout`
+
+## [feature/responsive-desktop-layout] - 2026-06-17
 - Polish pass. Item and recipe cards lift on hover (desktop pointer devices only) for tactile feedback. The home wordmark renders "Vibe" with an amber "Pantry" (PageHeader's title now accepts rich content). The pantry header (wordmark + Cook/Snap actions) sticks to the top on desktop so the brand and actions stay reachable down a long grid; mobile stays static.
 - Branch: `feature/responsive-desktop-layout`
 
