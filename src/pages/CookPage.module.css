@@ -232,6 +232,15 @@
   gap: var(--sp-3);
 }
 
+/* Desktop: recipe options side-by-side for a proper "pick one" moment.
+   Equal-height grid cells line the cards up cleanly for comparison. */
+@media (min-width: 700px) {
+  .options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
 .again {
   display: block;
   margin: var(--sp-5) auto 0;

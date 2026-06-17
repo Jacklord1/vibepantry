@@ -10,3 +10,12 @@
   /* clear the fixed bottom nav + safe area */
   padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + var(--sp-6));
 }
+
+/* Desktop: grid-heavy pages opt into a wider canvas by rendering a PageHeader
+   marked `wide`. Flow pages (Settings, Recipe, Add/Edit, Cook prefs) keep the
+   narrow reading lane. Mobile is untouched — this only fires above 700px. */
+@media (min-width: 700px) {
+  .main:has(header[data-canvas='wide']) {
+    max-width: var(--maxw-wide);
+  }
+}

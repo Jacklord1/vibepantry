@@ -11,6 +11,13 @@
   border-radius: var(--r-md);
 }
 
+/* Mobile: actions stack full-width under the wordmark (unchanged look).
+   Desktop turns .top into a header row below. */
+.actions {
+  display: flex;
+  flex-direction: column;
+}
+
 .cook {
   display: flex;
   align-items: center;
@@ -53,4 +60,36 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-6);
+}
+
+/* Desktop: a proper header row — wordmark + subtitle on the left, the two
+   actions as natural-width buttons on the right, instead of full-width bars
+   stretched across the wide canvas. Mobile (below 700px) stays stacked. */
+@media (min-width: 700px) {
+  .top {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--sp-6);
+    margin-bottom: var(--sp-5);
+  }
+
+  /* Drop PageHeader's own bottom margin so the row aligns cleanly. */
+  .top > header {
+    margin-bottom: 0;
+  }
+
+  .actions {
+    flex-direction: row;
+    flex-shrink: 0;
+    gap: var(--sp-3);
+  }
+
+  .cook,
+  .snap {
+    width: auto;
+    margin: 0;
+    padding: var(--sp-3) var(--sp-4);
+    white-space: nowrap;
+  }
 }

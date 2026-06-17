@@ -5,13 +5,29 @@
   bottom: 0;
   z-index: 20;
   display: flex;
-  justify-content: space-around;
-  align-items: stretch;
+  justify-content: center;
   height: calc(var(--nav-h) + var(--safe-bottom));
   padding-bottom: var(--safe-bottom);
   background: color-mix(in srgb, var(--c-bg-elev) 92%, transparent);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--c-border);
+}
+
+/* The bar stays full-bleed; the tabs live in a centred row. On mobile this
+   matches the content lane (= full width on a phone, identical to before).
+   On desktop it stops the four tabs flinging to the screen edges. */
+.inner {
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  width: 100%;
+  max-width: var(--maxw);
+}
+
+@media (min-width: 700px) {
+  .inner {
+    max-width: 640px;
+  }
 }
 
 .link {

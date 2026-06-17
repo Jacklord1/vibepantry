@@ -1,0 +1,5 @@
+# Changelog
+
+## [feature/responsive-desktop-layout] - 2026-06-17
+- Desktop design pass. Pantry items flow into a responsive multi-column grid; grid pages (Pantry, Cook options) use a wider 1040px canvas while flow pages keep the narrow reading lane. Pantry top becomes a desktop header row (wordmark left, Cook/Snap actions right) and stays stacked full-width on mobile. Item names wrap to two lines instead of clipping; edit/delete icons hover-reveal on desktop pointer devices for full-width names. Cook recipe options show 3-up. Bottom-nav tabs stay centred instead of flinging to the screen edges. Mobile is unchanged — every rule sits behind a `min-width:700px` breakpoint or a `:has()` marker.
+- Branch: `feature/responsive-desktop-layout`

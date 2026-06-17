@@ -142,6 +142,7 @@ export function CookPage() {
         <PageHeader
           title="Pick a recipe"
           subtitle="Three ways to cook from what you’ve got."
+          wide
         />
         <div className={styles.options}>
           {recipes.map((r) => (

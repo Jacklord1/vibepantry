@@ -70,7 +70,9 @@
   --shadow-2: 0 6px 20px rgba(0, 0, 0, 0.45);
 
   /* ---- Layout ---- */
-  --maxw: 560px; /* phone-first content column */
+  --maxw: 560px; /* phone-first reading lane — flow pages, all viewports */
+  --maxw-wide: 1040px; /* desktop canvas for grid pages (Pantry, Cook options) */
+  /* Desktop breakpoint is 700px, hardcoded in @media (CSS can't read a var there). */
   --nav-h: 64px; /* bottom-nav height */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 

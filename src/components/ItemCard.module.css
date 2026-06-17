@@ -18,9 +18,13 @@
 
 .name {
   font-weight: var(--fw-medium);
+  /* Wrap long names to up to two lines instead of clipping to one — readable
+     at narrow desktop grid widths without having to open the item. */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .quantity {
@@ -50,6 +54,36 @@
 .iconBtn:hover {
   color: var(--c-text);
   background: var(--c-surface-2);
+}
+
+/* Desktop with a real pointer: give the name the full cell width and reveal
+   the edit/delete icons on hover or keyboard focus. The actions float over the
+   right edge (out of flow) behind a scrim so they stay legible over a long
+   wrapped name. Touch devices (hover: none) and the confirm state are
+   excluded — their actions stay visible. */
+@media (min-width: 700px) and (hover: hover) {
+  .card:not(.confirm) {
+    position: relative;
+  }
+
+  .card:not(.confirm) .actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    padding-left: var(--sp-6);
+    padding-right: var(--sp-3);
+    background: linear-gradient(to right, transparent, var(--c-surface) 40%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--t-fast);
+  }
+
+  .card:not(.confirm):hover .actions,
+  .card:not(.confirm):focus-within .actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 /* delete-confirm state */

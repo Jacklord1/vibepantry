@@ -28,3 +28,12 @@
   flex-direction: column;
   gap: var(--sp-2);
 }
+
+/* Desktop: flow items into a responsive multi-column grid so a full pantry
+   stops being one long single-file scroll. */
+@media (min-width: 700px) {
+  .list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  }
+}

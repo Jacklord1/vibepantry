@@ -12,19 +12,21 @@ const links = [
 export function BottomNav() {
   return (
     <nav className={styles.nav} aria-label="Primary">
-      {links.map(({ to, label, Icon, end }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={end}
-          className={({ isActive }) =>
-            isActive ? `${styles.link} ${styles.active}` : styles.link
-          }
-        >
-          <Icon />
-          <span>{label}</span>
-        </NavLink>
-      ))}
+      <div className={styles.inner}>
+        {links.map(({ to, label, Icon, end }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              isActive ? `${styles.link} ${styles.active}` : styles.link
+            }
+          >
+            <Icon />
+            <span>{label}</span>
+          </NavLink>
+        ))}
+      </div>
     </nav>
   )
 }
