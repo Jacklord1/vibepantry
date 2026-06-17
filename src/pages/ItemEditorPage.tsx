@@ -5,6 +5,7 @@ import { getItem, putItem } from '../db'
 import { ItemForm } from '../components/ItemForm'
 import type { ItemFormValues } from '../components/ItemForm'
 import { PageHeader } from '../components/PageHeader'
+import { IconCamera } from '../components/Icons'
 import styles from './ItemEditorPage.module.css'
 
 /** Handles both /add (new item) and /edit/:id (existing item). */
@@ -64,13 +65,26 @@ export function ItemEditorPage() {
   return (
     <>
       <PageHeader
-        title={isEdit ? 'Edit item' : 'Add item'}
+        title={isEdit ? 'Edit item' : 'Add items'}
         subtitle={
           isEdit
             ? 'Update the details below.'
-            : 'Add something to your pantry by hand.'
+            : 'Snap a photo to add many at once, or type one in by hand.'
         }
       />
+
+      {!isEdit && (
+        <>
+          <button className={styles.snap} onClick={() => navigate('/snap')}>
+            <IconCamera size={20} />
+            Snap photos
+          </button>
+          <div className={styles.divider}>
+            <span>or add manually</span>
+          </div>
+        </>
+      )}
+
       <ItemForm
         initial={existing ?? undefined}
         submitLabel={isEdit ? 'Save changes' : 'Add to pantry'}

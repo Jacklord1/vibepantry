@@ -13,11 +13,9 @@ export function EmptyState() {
       <h2 className={styles.title}>No items yet</h2>
       <p className={styles.copy}>Snap your pantry to begin.</p>
 
-      {/* Snap CTA is wired in Phase 2 — placeholder for now. */}
-      <button className={styles.snap} disabled title="Coming in the next phase">
+      <button className={styles.snap} onClick={() => navigate('/snap')}>
         <IconCamera size={18} />
         Snap pantry
-        <span className={styles.soon}>soon</span>
       </button>
 
       <button className={styles.manual} onClick={() => navigate('/add')}>

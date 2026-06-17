@@ -11,3 +11,42 @@
   font-weight: var(--fw-medium);
   padding: var(--sp-2) var(--sp-4);
 }
+
+.snap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: var(--sp-4);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-1);
+}
+
+.snap:hover {
+  background: var(--c-accent-hover);
+}
+
+.snap:active {
+  transform: scale(0.99);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-5) 0;
+  color: var(--c-text-faint);
+  font-size: var(--fs-sm);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--c-border);
+}

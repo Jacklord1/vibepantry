@@ -31,24 +31,20 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: var(--sp-3) var(--sp-5);
+  padding: var(--sp-3) var(--sp-6);
   border-radius: var(--r-pill);
-  background: var(--c-surface);
-  border: 1px dashed var(--c-border-strong);
-  color: var(--c-text-faint);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
   font-weight: var(--fw-semibold);
-  cursor: not-allowed;
+  box-shadow: var(--shadow-1);
 }
 
-.soon {
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--c-accent);
-  background: var(--c-accent-soft);
-  padding: 1px var(--sp-2);
-  border-radius: var(--r-pill);
+.snap:hover {
+  background: var(--c-accent-hover);
+}
+
+.snap:active {
+  transform: scale(0.98);
 }
 
 .manual {

@@ -95,3 +95,11 @@ export function IconUpload({ size = 18, className }: IconProps) {
     </svg>
   )
 }
+
+export function IconCheck({ size = 18, className }: IconProps) {
+  return (
+    <svg {...svgProps(size)} className={className}>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  )
+}

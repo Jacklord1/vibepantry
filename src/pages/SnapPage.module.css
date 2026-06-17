@@ -1,0 +1,209 @@
+.status {
+  color: var(--c-text-muted);
+  padding: var(--sp-5) var(--sp-2);
+  text-align: center;
+}
+
+/* ---- key gate ---- */
+.gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6) var(--sp-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+}
+
+.gateCopy {
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+}
+
+/* ---- capture zone ---- */
+.zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-4);
+  border: 1px dashed var(--c-border-strong);
+  border-radius: var(--r-lg);
+  background: var(--c-surface);
+  transition: border-color var(--t-fast), background var(--t-fast);
+}
+
+.zoneOver {
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+}
+
+.captureRow {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.hint {
+  font-size: var(--fs-sm);
+  color: var(--c-text-faint);
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+}
+
+.primary:hover {
+  background: var(--c-accent-hover);
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-bg-elev);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-weight: var(--fw-medium);
+}
+
+.secondary:hover {
+  background: var(--c-surface-2);
+}
+
+/* ---- thumbnails ---- */
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.tile {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+}
+
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.badge {
+  position: absolute;
+  left: var(--sp-2);
+  bottom: var(--sp-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  padding: 2px var(--sp-2);
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--c-bg) 75%, transparent);
+  backdrop-filter: blur(4px);
+  color: var(--c-text);
+}
+
+.queued {
+  color: var(--c-text-muted);
+}
+
+.done {
+  color: var(--c-herb);
+}
+
+.reading {
+  color: var(--c-accent);
+}
+
+.error {
+  color: #fff;
+  background: var(--c-danger);
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid color-mix(in srgb, var(--c-accent) 35%, transparent);
+  border-top-color: var(--c-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.remove {
+  position: absolute;
+  top: var(--sp-1);
+  right: var(--sp-1);
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--c-bg) 70%, transparent);
+  backdrop-filter: blur(4px);
+  color: var(--c-text);
+}
+
+.remove:hover {
+  background: var(--c-danger);
+  color: #fff;
+}
+
+.tileError {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 2px var(--sp-2);
+  font-size: 10px;
+  line-height: 1.2;
+  color: #fff;
+  background: color-mix(in srgb, var(--c-danger) 88%, transparent);
+}
+
+/* ---- read button ---- */
+.read {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+}
+
+.read:hover:not(:disabled) {
+  background: var(--c-accent-hover);
+}
+
+.read:disabled {
+  opacity: 0.8;
+  cursor: default;
+}

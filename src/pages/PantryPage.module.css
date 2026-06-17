@@ -20,22 +20,14 @@
   margin-bottom: var(--sp-5);
   padding: var(--sp-3) var(--sp-4);
   border-radius: var(--r-pill);
-  background: var(--c-surface);
-  border: 1px dashed var(--c-border-strong);
-  color: var(--c-text-faint);
+  background: var(--c-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--c-accent) 35%, transparent);
+  color: var(--c-accent);
   font-weight: var(--fw-semibold);
-  cursor: not-allowed;
 }
 
-.soon {
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--c-accent);
-  background: var(--c-accent-soft);
-  padding: 1px var(--sp-2);
-  border-radius: var(--r-pill);
+.snap:hover {
+  background: color-mix(in srgb, var(--c-accent) 22%, transparent);
 }
 
 .groups {

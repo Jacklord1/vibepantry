@@ -34,15 +34,9 @@ export function PantryPage() {
         <EmptyState />
       ) : (
         <>
-          {/* Snap CTA placeholder — wired in Phase 2. */}
-          <button
-            className={styles.snap}
-            disabled
-            title="Coming in the next phase"
-          >
+          <button className={styles.snap} onClick={() => navigate('/snap')}>
             <IconCamera size={18} />
             Snap to add more
-            <span className={styles.soon}>soon</span>
           </button>
 
           <div className={styles.groups}>
