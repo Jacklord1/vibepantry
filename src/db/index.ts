@@ -76,6 +76,31 @@ export async function clearItems(): Promise<void> {
   await db.clear('items')
 }
 
+/* ---------- Recipes (generation history) ---------- */
+
+export async function getAllRecipes(): Promise<Recipe[]> {
+  const db = await getDB()
+  return db.getAll('recipes')
+}
+
+export async function getRecipe(id: string): Promise<Recipe | undefined> {
+  const db = await getDB()
+  return db.get('recipes', id)
+}
+
+export async function putRecipe(recipe: Recipe): Promise<void> {
+  const db = await getDB()
+  await db.put('recipes', recipe)
+}
+
+/** Save a batch of freshly generated recipes (history). */
+export async function saveRecipes(recipes: Recipe[]): Promise<void> {
+  const db = await getDB()
+  const tx = db.transaction('recipes', 'readwrite')
+  for (const r of recipes) await tx.store.put(r)
+  await tx.done
+}
+
 /* ---------- Settings (key/value) ---------- */
 
 export async function getSetting(key: string): Promise<string | undefined> {

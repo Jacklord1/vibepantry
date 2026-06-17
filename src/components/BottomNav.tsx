@@ -1,9 +1,10 @@
 import { NavLink } from 'react-router-dom'
-import { IconAdd, IconPantry, IconSettings } from './Icons'
+import { IconAdd, IconCook, IconPantry, IconSettings } from './Icons'
 import styles from './BottomNav.module.css'
 
 const links = [
   { to: '/', label: 'Pantry', Icon: IconPantry, end: true },
+  { to: '/cook', label: 'Cook', Icon: IconCook, end: false },
   { to: '/add', label: 'Add', Icon: IconAdd, end: false },
   { to: '/settings', label: 'Settings', Icon: IconSettings, end: false },
 ]

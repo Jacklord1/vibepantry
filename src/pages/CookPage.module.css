@@ -1,0 +1,228 @@
+.status {
+  color: var(--c-text-muted);
+  padding: var(--sp-6) var(--sp-2);
+  text-align: center;
+}
+
+/* ---- gate / empty ---- */
+.gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-4);
+  padding: var(--sp-6) var(--sp-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+}
+
+.gateCopy {
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+}
+
+.gateRow {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ---- preference questions ---- */
+.q {
+  margin-bottom: var(--sp-5);
+}
+
+.qTitle {
+  font-size: var(--fs-h2);
+  margin-bottom: var(--sp-3);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.chip {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  color: var(--c-text);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-sm);
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast);
+}
+
+.chip:hover {
+  background: var(--c-surface-2);
+}
+
+.chipOn {
+  background: var(--c-accent-soft);
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.segment {
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-1);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+}
+
+.seg {
+  flex: 1;
+  padding: var(--sp-3);
+  border-radius: var(--r-sm);
+  color: var(--c-text-muted);
+  font-weight: var(--fw-medium);
+  transition:
+    background var(--t-fast),
+    color var(--t-fast);
+}
+
+.seg:hover {
+  color: var(--c-text);
+}
+
+.segOn {
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+}
+
+/* ---- actions ---- */
+.cook {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  padding: var(--sp-4);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-1);
+}
+
+.cook:hover {
+  background: var(--c-accent-hover);
+}
+
+.primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+}
+
+.primary:hover {
+  background: var(--c-accent-hover);
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-bg-elev);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-weight: var(--fw-medium);
+}
+
+.error {
+  color: var(--c-danger);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--sp-3);
+}
+
+/* ---- cooking / loading ---- */
+.cooking {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-8) var(--sp-4);
+  color: var(--c-text-muted);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid color-mix(in srgb, var(--c-accent) 30%, transparent);
+  border-top-color: var(--c-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- options ---- */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.again {
+  display: block;
+  margin: var(--sp-5) auto 0;
+  color: var(--c-accent);
+  font-weight: var(--fw-medium);
+  padding: var(--sp-2) var(--sp-4);
+}
+
+/* ---- history ---- */
+.history {
+  margin-top: var(--sp-8);
+}
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.recent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+}
+
+.recent:hover {
+  background: var(--c-surface-2);
+}
+
+.recentTitle {
+  font-weight: var(--fw-medium);
+}
+
+.recentMeta {
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+}

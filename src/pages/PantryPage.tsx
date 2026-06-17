@@ -4,7 +4,7 @@ import { deleteItem } from '../db'
 import { PageHeader } from '../components/PageHeader'
 import { CategoryGroup } from '../components/CategoryGroup'
 import { EmptyState } from '../components/EmptyState'
-import { IconCamera } from '../components/Icons'
+import { IconCamera, IconCook } from '../components/Icons'
 import styles from './PantryPage.module.css'
 
 export function PantryPage() {
@@ -34,6 +34,10 @@ export function PantryPage() {
         <EmptyState />
       ) : (
         <>
+          <button className={styles.cook} onClick={() => navigate('/cook')}>
+            <IconCook size={20} />
+            Cook from my pantry
+          </button>
           <button className={styles.snap} onClick={() => navigate('/snap')}>
             <IconCamera size={18} />
             Snap to add more

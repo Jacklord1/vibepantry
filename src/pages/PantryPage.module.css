@@ -11,6 +11,25 @@
   border-radius: var(--r-md);
 }
 
+.cook {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  width: 100%;
+  margin-bottom: var(--sp-2);
+  padding: var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  box-shadow: var(--shadow-1);
+}
+
+.cook:hover {
+  background: var(--c-accent-hover);
+}
+
 .snap {
   display: flex;
   align-items: center;

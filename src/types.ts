@@ -48,4 +48,5 @@ export type Recipe = {
     fat_g: number
   } | null
   tags: string[] // "high-protein", "fast", "one-pan"
+  createdAt?: string // ISO — when generated (for history ordering)
 }

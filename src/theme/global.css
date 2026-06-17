@@ -95,3 +95,30 @@ svg {
 #root {
   min-height: 100dvh;
 }
+
+/* Print: strip the app chrome so a recipe card prints as a clean one-pager.
+   The bottom nav, action bars, and dark theme all drop away; only the printed
+   content remains, framed by the page margin. */
+@page {
+  margin: 1.5cm;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    background: #fff !important;
+    color: #000 !important;
+    min-height: 0;
+  }
+  /* Hide the fixed bottom nav. */
+  nav {
+    display: none !important;
+  }
+  /* Drop the phone-column constraints so the sheet uses the full page. */
+  main {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}

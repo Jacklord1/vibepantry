@@ -1,0 +1,56 @@
+.status {
+  color: var(--c-text-muted);
+  padding: var(--sp-6) var(--sp-2);
+  text-align: center;
+}
+
+.back {
+  display: block;
+  margin: var(--sp-2) auto 0;
+  color: var(--c-accent);
+  font-weight: var(--fw-medium);
+  padding: var(--sp-2) var(--sp-4);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.barBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--c-text-muted);
+  font-weight: var(--fw-medium);
+  padding: var(--sp-2) var(--sp-2);
+}
+
+.barBtn:hover {
+  color: var(--c-text);
+}
+
+.print {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+}
+
+.print:hover {
+  background: var(--c-accent-hover);
+}
+
+/* The action bar never prints. */
+@media print {
+  .bar {
+    display: none;
+  }
+}

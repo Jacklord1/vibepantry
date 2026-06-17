@@ -2,6 +2,7 @@ import type { Category, Macros, PantryItem } from '../types'
 import { CATEGORIES, DEFAULT_CATEGORY } from './categories'
 import { callMessages } from './anthropic'
 import { downscaleToBase64 } from './image'
+import { extractJsonObject } from './json'
 
 // Vision extraction — the hero call. One image per request, returns an array
 // of items (multi-item per photo is the point; a single item or a nutrition
@@ -43,22 +44,6 @@ export class VisionParseError extends Error {
   }
 }
 
-/** Strip ```json fences and any stray prose around the JSON object. */
-function stripFences(text: string): string {
-  let t = text.trim()
-  // Remove a leading ```json / ``` and a trailing ``` if present.
-  t = t.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '')
-  // If there's still surrounding prose, grab the outermost {...}.
-  const first = t.indexOf('{')
-  const last = t.lastIndexOf('}')
-  if (first > 0 || (last !== -1 && last < t.length - 1)) {
-    if (first !== -1 && last !== -1 && last > first) {
-      t = t.slice(first, last + 1)
-    }
-  }
-  return t.trim()
-}
-
 function coerceMacros(value: unknown): Macros | null {
   if (typeof value !== 'object' || value === null) return null
   const o = value as Record<string, unknown>
@@ -79,7 +64,7 @@ function coerceMacros(value: unknown): Macros | null {
 export function parseVisionResponse(text: string): RawItem[] {
   let parsed: unknown
   try {
-    parsed = JSON.parse(stripFences(text))
+    parsed = JSON.parse(extractJsonObject(text))
   } catch {
     throw new VisionParseError()
   }

@@ -103,3 +103,31 @@ export function IconCheck({ size = 18, className }: IconProps) {
     </svg>
   )
 }
+
+export function IconCook({ size = 22, className }: IconProps) {
+  return (
+    <svg {...svgProps(size)} className={className}>
+      <path d="M6 14a4 4 0 0 1-.7-7.94A4.5 4.5 0 0 1 12 4.5a4.5 4.5 0 0 1 6.7 1.56A4 4 0 0 1 18 14" />
+      <path d="M6 14h12v5a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1z" />
+      <path d="M10 14v3M14 14v3" />
+    </svg>
+  )
+}
+
+export function IconPrint({ size = 18, className }: IconProps) {
+  return (
+    <svg {...svgProps(size)} className={className}>
+      <path d="M6 9V3h12v6" />
+      <path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2" />
+      <path d="M6 14h12v7H6z" />
+    </svg>
+  )
+}
+
+export function IconChevronLeft({ size = 20, className }: IconProps) {
+  return (
+    <svg {...svgProps(size)} className={className}>
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  )
+}
