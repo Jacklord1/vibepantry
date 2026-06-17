@@ -1,0 +1,30 @@
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.heading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  font-size: var(--fs-h2);
+  color: var(--c-text);
+  padding: 0 var(--sp-1);
+}
+
+.count {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  color: var(--c-accent);
+  background: var(--c-accent-soft);
+  padding: 1px var(--sp-2);
+  border-radius: var(--r-pill);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}

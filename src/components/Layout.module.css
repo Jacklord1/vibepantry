@@ -1,0 +1,12 @@
+.shell {
+  min-height: 100dvh;
+}
+
+.main {
+  width: 100%;
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: var(--sp-5) var(--sp-4);
+  /* clear the fixed bottom nav + safe area */
+  padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + var(--sp-6));
+}

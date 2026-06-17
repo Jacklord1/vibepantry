@@ -1,0 +1,13 @@
+.status {
+  color: var(--c-text-muted);
+  padding: var(--sp-6) var(--sp-2);
+  text-align: center;
+}
+
+.back {
+  display: block;
+  margin: var(--sp-4) auto 0;
+  color: var(--c-accent);
+  font-weight: var(--fw-medium);
+  padding: var(--sp-2) var(--sp-4);
+}

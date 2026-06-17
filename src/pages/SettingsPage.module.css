@@ -1,0 +1,125 @@
+.section {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.h2 {
+  font-size: var(--fs-h2);
+  margin-bottom: var(--sp-2);
+}
+
+.note {
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+  line-height: var(--lh-body);
+  margin-bottom: var(--sp-4);
+}
+
+.note code {
+  font-family: var(--font-body);
+  color: var(--c-text);
+  background: var(--c-bg-elev);
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
+  font-size: 0.85em;
+}
+
+.input {
+  width: 100%;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-bg-elev);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  margin-bottom: var(--sp-3);
+}
+
+.input:focus {
+  border-color: var(--c-accent);
+  outline: none;
+}
+
+.keyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.masked {
+  font-family: var(--font-body);
+  letter-spacing: 0.1em;
+  color: var(--c-text);
+  background: var(--c-bg-elev);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-md);
+}
+
+.keyEdit {
+  display: flex;
+  flex-direction: column;
+}
+
+.keyActions,
+.dataActions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.primary {
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+}
+
+.primary:hover {
+  background: var(--c-accent-hover);
+}
+
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-bg-elev);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-weight: var(--fw-medium);
+}
+
+.secondary:hover {
+  background: var(--c-surface-2);
+}
+
+.danger {
+  padding: var(--sp-3) var(--sp-4);
+  background: transparent;
+  color: var(--c-danger);
+  border: 1px solid color-mix(in srgb, var(--c-danger) 40%, transparent);
+  border-radius: var(--r-md);
+  font-weight: var(--fw-medium);
+}
+
+.danger:hover {
+  background: var(--c-danger-soft);
+}
+
+.ok {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--c-herb);
+}
+
+.err {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--c-danger);
+}

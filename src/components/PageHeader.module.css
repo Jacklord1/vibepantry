@@ -1,0 +1,19 @@
+.header {
+  margin-bottom: var(--sp-5);
+}
+
+.wordmark {
+  font-size: var(--fs-display);
+  letter-spacing: -0.02em;
+}
+
+/* tint the second half of the wordmark? keep simple: accent the dot */
+.title {
+  font-size: var(--fs-h1);
+}
+
+.subtitle {
+  margin-top: var(--sp-1);
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+}

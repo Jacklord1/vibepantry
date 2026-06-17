@@ -1,0 +1,18 @@
+{
+  "name": "VibePantry",
+  "short_name": "VibePantry",
+  "description": "Snap your pantry, cook from what you have. Static, bring-your-own-key, your data never leaves your browser.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#17120e",
+  "theme_color": "#17120e",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
