@@ -1,0 +1,5 @@
+# Cloudflare Pages SPA fallback. Real files (/assets/*, /sw.js, /registerSW.js,
+# /manifest.webmanifest, icons) are served first; everything else (/, /app, and
+# deep links) falls back to index.html, where the path-gated bootstrap + the
+# app's HashRouter take over.
+/* /index.html 200

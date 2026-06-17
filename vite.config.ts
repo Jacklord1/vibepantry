@@ -2,11 +2,13 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Relative base so the built `dist/` works from any path:
-// static hosts, GitHub Pages project sites, Docker/nginx, file://.
+// Absolute base — the app is hosted at a domain root (vibepantry.com on
+// Cloudflare Pages; also Docker/nginx or any static host served from `/`).
+// Root hosting is required by the landing (`/`) ↔ app (`/app`) split, and it
+// lets the service worker register at `/sw.js` with scope `/`.
 // https://vite.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [
     react(),
     VitePWA({
@@ -21,8 +23,9 @@ export default defineConfig({
         theme_color: '#17120e',
         background_color: '#17120e',
         display: 'standalone',
-        start_url: './',
-        scope: './',
+        // Installed PWA opens the app, not the landing page.
+        start_url: '/app',
+        scope: '/',
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },

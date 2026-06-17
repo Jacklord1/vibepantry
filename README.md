@@ -30,10 +30,11 @@ never leaves your browser.**
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173
+npm run dev      # landing: http://localhost:5173  ·  app: http://localhost:5173/app
 ```
 
-Then open **Settings**, paste your Anthropic API key, and start snapping.
+Open the app at **`/app`**, go to **Settings**, paste your Anthropic API key, and
+start snapping.
 
 ## Build & self-host
 
@@ -41,14 +42,19 @@ Then open **Settings**, paste your Anthropic API key, and start snapping.
 npm run build    # outputs a static site (incl. service worker) to dist/
 ```
 
-`dist/` is a self-contained static PWA — host it three ways:
+`dist/` is a self-contained static PWA, served from a **domain root**. It puts a
+landing page at `/` and the app itself at **`/app`** (the app uses hash routing,
+so deep links like `/app#/cook` and refreshes work with a simple SPA fallback).
+Host it three ways:
 
-**1. Any static host** (Netlify, Cloudflare Pages, Vercel, an S3 bucket):
-drop the contents of `dist/` in. The app uses hash routing and relative asset
-paths, so it works from any path with no server rewrites.
+**1. Any static host** (Cloudflare Pages, Netlify, Vercel, an S3 bucket + CDN):
+drop the contents of `dist/` in and add an SPA fallback to `index.html`. For
+Cloudflare Pages there's a step-by-step guide in **[SETUP.md](./SETUP.md)** —
+that's how the hosted site at vibepantry.com is deployed.
 
-**2. GitHub Pages:** push `dist/` to a `gh-pages` branch (or use an action).
-Hash routing means deep links and refreshes work without a 404 workaround.
+**2. GitHub Pages:** works on a **user/org site or a custom domain** (served at
+the root). A `/<repo>/` project subpath won't work — the build uses absolute
+asset paths. Push `dist/` to a `gh-pages` branch (or use an action).
 
 **3. Docker (nginx):**
 
