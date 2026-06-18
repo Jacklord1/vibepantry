@@ -146,3 +146,29 @@ details[open] .summary {
   font-size: var(--fs-sm);
   color: var(--c-danger);
 }
+
+.usageRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.usageRow:last-of-type {
+  border-bottom: none;
+}
+
+.usageLabel {
+  font-weight: var(--fw-medium);
+}
+
+.usageTotal {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+  font-weight: var(--fw-semibold);
+}

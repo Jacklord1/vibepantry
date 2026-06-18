@@ -8,6 +8,12 @@ import {
 } from '../db'
 import { PageHeader } from '../components/PageHeader'
 import { IconDownload, IconUpload } from '../components/Icons'
+import {
+  getUsageLog,
+  estimateUsd,
+  resetUsage,
+  type UsageBucket,
+} from '../lib/usage'
 import styles from './SettingsPage.module.css'
 
 const API_KEY = 'apiKey'
@@ -31,17 +37,21 @@ export function SettingsPage() {
   const [endpointInput, setEndpointInput] = useState('')
   const [endpointNotice, setEndpointNotice] = useState<Notice>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const [usageBuckets, setUsageBuckets] = useState<UsageBucket[]>([])
+  const [usageNotice, setUsageNotice] = useState<Notice>(null)
 
   useEffect(() => {
     void (async () => {
-      const [key, endpoint] = await Promise.all([
+      const [key, endpoint, usageLog] = await Promise.all([
         getSetting(API_KEY),
         getSetting(API_ENDPOINT),
+        getUsageLog(),
       ])
       setSavedKey(key ?? null)
       setEditing(!key) // open the input when nothing is set yet
       setSavedEndpoint(endpoint ?? null)
       setEndpointInput(endpoint ?? '')
+      setUsageBuckets(Object.values(usageLog.buckets))
       setLoaded(true)
     })()
   }, [])
@@ -71,6 +81,12 @@ export function SettingsPage() {
       kind: 'ok',
       text: 'Endpoint cleared — calling Anthropic directly.',
     })
+  }
+
+  async function resetUsageLog() {
+    await resetUsage()
+    setUsageBuckets([])
+    setUsageNotice({ kind: 'ok', text: 'Usage history cleared.' })
   }
 
   async function saveKey() {
@@ -132,6 +148,16 @@ export function SettingsPage() {
       })
     }
   }
+
+  const sortedBuckets = [...usageBuckets].sort(
+    (a, b) => a.kind.localeCompare(b.kind) || a.model.localeCompare(b.model),
+  )
+  const totalCalls = usageBuckets.reduce((n, b) => n + b.calls, 0)
+  const totalTokens = usageBuckets.reduce(
+    (n, b) => n + b.inputTokens + b.outputTokens,
+    0,
+  )
+  const totalUsd = usageBuckets.reduce((n, b) => n + estimateUsd(b), 0)
 
   return (
     <>
@@ -239,6 +265,58 @@ export function SettingsPage() {
             role="status"
           >
             {dataNotice.text}
+          </p>
+        )}
+      </section>
+
+      {/* ---- API usage ---- */}
+      <section className={styles.section}>
+        <h2 className={styles.h2}>API usage</h2>
+        <p className={styles.note}>
+          Counted on this device only — usage never leaves your browser.
+          Estimates use Anthropic list pricing (USD); your actual bill depends
+          on your plan.
+        </p>
+
+        {!loaded ? null : sortedBuckets.length === 0 ? (
+          <p className={styles.note}>No calls recorded yet.</p>
+        ) : (
+          <>
+            {sortedBuckets.map((b) => (
+              <div className={styles.usageRow} key={`${b.kind}:${b.model}`}>
+                <span className={styles.usageLabel}>
+                  {b.kind} · {b.model}
+                </span>
+                <code className={styles.masked}>
+                  {b.calls.toLocaleString()} calls ·{' '}
+                  {(b.inputTokens + b.outputTokens).toLocaleString()} tok · ~$
+                  {estimateUsd(b).toFixed(2)}
+                </code>
+              </div>
+            ))}
+
+            <div className={styles.usageTotal}>
+              <span>Total</span>
+              <span>
+                {totalCalls.toLocaleString()} calls ·{' '}
+                {totalTokens.toLocaleString()} tok · ~${totalUsd.toFixed(2)}
+              </span>
+            </div>
+
+            <div className={styles.keyActions}>
+              <button className={styles.danger} onClick={resetUsageLog}>
+                Reset
+              </button>
+            </div>
+          </>
+        )}
+
+        {usageNotice && (
+          <p
+            className={usageNotice.kind === 'ok' ? styles.ok : styles.err}
+            role="status"
+          >
+            {usageNotice.text}
           </p>
         )}
       </section>
