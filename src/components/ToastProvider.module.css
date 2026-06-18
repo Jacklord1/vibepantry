@@ -1,0 +1,82 @@
+/* Fixed snackbar stack, centred above the bottom nav + safe area. The viewport
+   ignores pointer events so it never blocks the page; individual toasts opt
+   back in. */
+.viewport {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + var(--sp-3));
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 0 var(--sp-4);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  width: 100%;
+  max-width: var(--maxw);
+  padding: var(--sp-3) var(--sp-2) var(--sp-3) var(--sp-4);
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-2);
+  animation: toastIn var(--t-med);
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-tight);
+}
+
+.action {
+  flex-shrink: 0;
+  color: var(--c-accent);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-sm);
+  transition: background var(--t-fast);
+}
+
+.action:hover {
+  background: var(--c-accent-soft);
+}
+
+.action:active {
+  transform: scale(0.96);
+}
+
+.close {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  color: var(--c-text-muted);
+  transition: color var(--t-fast);
+}
+
+.close:hover {
+  color: var(--c-text);
+}

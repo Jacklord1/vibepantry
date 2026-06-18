@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import type { PantryItem } from '../types'
 import { IconEdit, IconTrash } from './Icons'
 import styles from './ItemCard.module.css'
@@ -9,28 +8,9 @@ type Props = {
   onDelete: (id: string) => void
 }
 
+/** Deletes immediately — the pantry surfaces an Undo snackbar, so there's no
+    confirm step to slow the common case. */
 export function ItemCard({ item, onEdit, onDelete }: Props) {
-  const [confirming, setConfirming] = useState(false)
-
-  if (confirming) {
-    return (
-      <li className={`${styles.card} ${styles.confirm}`}>
-        <span className={styles.confirmText}>Delete “{item.name}”?</span>
-        <div className={styles.actions}>
-          <button
-            className={styles.cancel}
-            onClick={() => setConfirming(false)}
-          >
-            Cancel
-          </button>
-          <button className={styles.delete} onClick={() => onDelete(item.id)}>
-            Delete
-          </button>
-        </div>
-      </li>
-    )
-  }
-
   return (
     <li className={styles.card}>
       <div className={styles.body}>
@@ -49,7 +29,7 @@ export function ItemCard({ item, onEdit, onDelete }: Props) {
         </button>
         <button
           className={styles.iconBtn}
-          onClick={() => setConfirming(true)}
+          onClick={() => onDelete(item.id)}
           aria-label={`Delete ${item.name}`}
         >
           <IconTrash />

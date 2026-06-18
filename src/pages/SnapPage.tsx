@@ -6,6 +6,7 @@ import { putItem } from '../db'
 import { hasApiAccess, MissingApiKeyError } from '../lib/anthropic'
 import { extractItemsFromPhoto } from '../lib/vision'
 import { uuid } from '../lib/id'
+import { useToast } from '../hooks/useToast'
 import { PageHeader } from '../components/PageHeader'
 import { ReviewGrid } from '../components/ReviewGrid'
 import type { RowPatch } from '../components/ReviewGrid'
@@ -58,6 +59,7 @@ function mergeItems(items: PantryItem[]): PantryItem[] {
 
 export function SnapPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [gated, setGated] = useState<boolean | null>(null) // null = checking
   const [photos, setPhotos] = useState<Photo[]>([])
   const [reviewItems, setReviewItems] = useState<PantryItem[]>([])
@@ -149,9 +151,13 @@ export function SnapPage() {
     if (!reviewItems.length) return
     setAccepting(true)
     try {
+      const count = reviewItems.length
       for (const item of reviewItems) {
         await putItem({ ...item, name: item.name.trim(), confirmed: true })
       }
+      toast({
+        message: `Added ${count} item${count === 1 ? '' : 's'} to your pantry`,
+      })
       navigate('/')
     } finally {
       setAccepting(false)

@@ -1,4 +1,5 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { ToastProvider } from './components/ToastProvider'
 import { Layout } from './components/Layout'
 import { PantryPage } from './pages/PantryPage'
 import { ItemEditorPage } from './pages/ItemEditorPage'
@@ -12,18 +13,20 @@ import { SettingsPage } from './pages/SettingsPage'
 export function App() {
   return (
     <HashRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<PantryPage />} />
-          <Route path="add" element={<ItemEditorPage />} />
-          <Route path="snap" element={<SnapPage />} />
-          <Route path="cook" element={<CookPage />} />
-          <Route path="recipe/:id" element={<RecipePage />} />
-          <Route path="edit/:id" element={<ItemEditorPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
+      <ToastProvider>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<PantryPage />} />
+            <Route path="add" element={<ItemEditorPage />} />
+            <Route path="snap" element={<SnapPage />} />
+            <Route path="cook" element={<CookPage />} />
+            <Route path="recipe/:id" element={<RecipePage />} />
+            <Route path="edit/:id" element={<ItemEditorPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </ToastProvider>
     </HashRouter>
   )
 }

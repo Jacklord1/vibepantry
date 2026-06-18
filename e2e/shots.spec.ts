@@ -76,6 +76,15 @@ test.describe(() => {
     await shoot(page, 'settings')
   })
 
+  test('undo toast', async ({ page }) => {
+    await seedAll(page)
+    await page.goto('/app')
+    await page.getByText('Use soon').waitFor()
+    await page.getByRole('button', { name: 'Delete Chicken thighs' }).click()
+    await page.getByText('Removed Chicken thighs').waitFor()
+    await shoot(page, 'undo-toast')
+  })
+
   test('review grid', async ({ page }) => {
     const mockUrl = await seedProxyEndpoint(page)
     await page.route(`**${mockUrl}`, (route) =>

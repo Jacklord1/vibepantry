@@ -68,23 +68,22 @@
 /* Desktop with a real pointer: give the name the full cell width and reveal
    the edit/delete icons on hover or keyboard focus. The actions float over the
    right edge (out of flow) behind a scrim so they stay legible over a long
-   wrapped name. Touch devices (hover: none) and the confirm state are
-   excluded — their actions stay visible. */
+   wrapped name. Touch devices (hover: none) keep their actions visible. */
 @media (min-width: 700px) and (hover: hover) {
-  .card:not(.confirm) {
+  .card {
     position: relative;
     /* clip the absolutely-positioned action scrim to the card's rounded
        corners so the right corners don't go square on hover */
     overflow: hidden;
   }
 
-  .card:not(.confirm):hover {
+  .card:hover {
     border-color: var(--c-border-strong);
     transform: translateY(-2px);
     box-shadow: var(--shadow-2);
   }
 
-  .card:not(.confirm) .actions {
+  .card .actions {
     position: absolute;
     top: 0;
     right: 0;
@@ -97,45 +96,9 @@
     transition: opacity var(--t-fast);
   }
 
-  .card:not(.confirm):hover .actions,
-  .card:not(.confirm):focus-within .actions {
+  .card:hover .actions,
+  .card:focus-within .actions {
     opacity: 1;
     pointer-events: auto;
   }
-}
-
-/* delete-confirm state */
-.confirm {
-  background: var(--c-danger-soft);
-  border-color: color-mix(in srgb, var(--c-danger) 40%, transparent);
-}
-
-.confirmText {
-  flex: 1;
-  min-width: 0;
-  font-size: var(--fs-sm);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cancel {
-  padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--r-sm);
-  color: var(--c-text-muted);
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-medium);
-}
-
-.cancel:hover {
-  color: var(--c-text);
-}
-
-.delete {
-  padding: var(--sp-2) var(--sp-4);
-  border-radius: var(--r-sm);
-  background: var(--c-danger);
-  color: #fff;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
 }

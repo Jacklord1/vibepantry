@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { usePantry } from '../hooks/usePantry'
-import { deleteItem } from '../db'
+import { useToast } from '../hooks/useToast'
+import { deleteItem, putItem } from '../db'
 import { expiringSoonCount } from '../lib/expiry'
 import { PageHeader } from '../components/PageHeader'
 import { CategoryGroup } from '../components/CategoryGroup'
@@ -12,6 +13,7 @@ import styles from './PantryPage.module.css'
 
 export function PantryPage() {
   const navigate = useNavigate()
+  const toast = useToast()
   const { groups, items, loading, error, refresh } = usePantry()
   const [bannerDismissed, setBannerDismissed] = useState(false)
   const [query, setQuery] = useState('')
@@ -35,8 +37,21 @@ export function PantryPage() {
   const matchCount = filteredGroups.reduce((n, g) => n + g.items.length, 0)
 
   async function handleDelete(id: string) {
+    const removed = items.find((i) => i.id === id)
     await deleteItem(id)
     await refresh()
+    if (removed) {
+      toast({
+        message: `Removed ${removed.name}`,
+        action: {
+          label: 'Undo',
+          onClick: async () => {
+            await putItem(removed)
+            await refresh()
+          },
+        },
+      })
+    }
   }
 
   return (
