@@ -1,9 +1,20 @@
 import type { Category, PantryItem } from '../types'
-import { CATEGORIES } from '../lib/categories'
+import { CATEGORIES, isPerishable } from '../lib/categories'
+import { isoDaysFromToday } from '../lib/expiry'
 import { IconCheck, IconTrash } from './Icons'
 import styles from './ReviewGrid.module.css'
 
-export type RowPatch = Partial<Pick<PantryItem, 'name' | 'quantity' | 'category'>>
+export type RowPatch = Partial<
+  Pick<PantryItem, 'name' | 'quantity' | 'category' | 'expiry'>
+>
+
+// Quick relative "use by" options for perishables (today + N days). The native
+// date picker covers everything else.
+const EXPIRY_PRESETS = [
+  { label: '2d', days: 2 },
+  { label: '5d', days: 5 },
+  { label: '1wk', days: 7 },
+] as const
 
 type Props = {
   items: PantryItem[]
@@ -92,6 +103,36 @@ export function ReviewGrid({
                 </select>
                 {hasMacros(item) && <span className={styles.macros}>macros</span>}
               </div>
+              {isPerishable(item.category) && (
+                <div className={styles.expiry}>
+                  <span className={styles.expLabel}>use by?</span>
+                  {EXPIRY_PRESETS.map((p) => {
+                    const iso = isoDaysFromToday(p.days)
+                    const on = item.expiry === iso
+                    return (
+                      <button
+                        key={p.days}
+                        className={`${styles.expChip} ${on ? styles.expChipOn : ''}`}
+                        aria-pressed={on}
+                        onClick={() =>
+                          onUpdate(item.id, { expiry: on ? null : iso })
+                        }
+                      >
+                        {p.label}
+                      </button>
+                    )
+                  })}
+                  <input
+                    type="date"
+                    className={styles.expDate}
+                    value={item.expiry ?? ''}
+                    onChange={(e) =>
+                      onUpdate(item.id, { expiry: e.target.value || null })
+                    }
+                    aria-label="Pick expiry date"
+                  />
+                </div>
+              )}
             </div>
             <button
               className={styles.del}

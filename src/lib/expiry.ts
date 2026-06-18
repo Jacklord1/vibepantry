@@ -16,6 +16,19 @@ export function daysUntil(iso: string | null | undefined): number | null {
 }
 
 /**
+ * Today + N days as a `yyyy-mm-dd` string, built from LOCAL date components (not
+ * toISOString, which would shift across the UTC boundary) so it round-trips with
+ * `daysUntil` above. Used by the review grid's quick expiry chips.
+ */
+export function isoDaysFromToday(days: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() + days)
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${m}-${day}`
+}
+
+/**
  * Urgency for the Use-soon view. Returns null for items with no expiry or
  * more than a week out (they don't need surfacing yet).
  */

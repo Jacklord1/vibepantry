@@ -43,3 +43,18 @@ export function categoryOrder(c: Category): number {
 }
 
 export const DEFAULT_CATEGORY: Category = 'other'
+
+// Categories that spoil within days — these get the optional "use by" expiry
+// chips in the review grid. Shelf-stable categories (pantry_dry, spices, frozen,
+// beverages, other) don't, to keep the confirm step clean. `frozen` is excluded
+// deliberately (months-long); add it here if that changes.
+export const PERISHABLE_CATEGORIES = new Set<Category>([
+  'produce',
+  'meat_seafood',
+  'dairy_eggs',
+  'bakery',
+])
+
+export function isPerishable(c: Category): boolean {
+  return PERISHABLE_CATEGORIES.has(c)
+}

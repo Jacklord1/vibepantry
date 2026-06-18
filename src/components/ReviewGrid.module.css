@@ -56,7 +56,9 @@
 
 .row {
   display: flex;
-  align-items: center;
+  /* Top-aligned so the trash sits level with the name row, not the middle of a
+     taller (3-row) perishable card. */
+  align-items: flex-start;
   gap: var(--sp-2);
   padding: var(--sp-3);
   background: var(--c-surface);
@@ -128,6 +130,66 @@
   background: var(--c-herb-soft);
   padding: 2px var(--sp-2);
   border-radius: var(--r-pill);
+}
+
+/* Optional "use by" chip row — perishable cards only. Quiet/ghost so it reads as
+   subordinate to the qty/category fields; nothing here is required. */
+.expiry {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: 2px;
+}
+
+.expLabel {
+  font-size: var(--fs-xs);
+  color: var(--c-text-faint);
+}
+
+.expChip {
+  padding: 2px var(--sp-3);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-medium);
+  color: var(--c-text-muted);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-pill);
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast),
+    color var(--t-fast);
+}
+
+@media (hover: hover) {
+  .expChip:hover {
+    background: var(--c-surface-2);
+    color: var(--c-text);
+  }
+}
+
+.expChip:active {
+  transform: scale(0.97);
+}
+
+.expChipOn {
+  background: var(--c-accent-soft);
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.expDate {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-pill);
+  padding: 2px var(--sp-2);
+}
+
+.expDate:focus {
+  border-color: var(--c-accent);
+  outline: none;
 }
 
 .del {
