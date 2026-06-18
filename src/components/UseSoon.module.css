@@ -72,6 +72,12 @@
   width: 100%;
   text-align: left;
   padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  transition: transform var(--t-fast);
+}
+
+.rowBtn:active {
+  transform: scale(0.99);
 }
 
 .dot {

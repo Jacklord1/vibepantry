@@ -106,6 +106,10 @@
   background: var(--c-accent-hover);
 }
 
+.cook:active {
+  transform: scale(0.99);
+}
+
 .snap {
   display: flex;
   align-items: center;
@@ -123,6 +127,10 @@
 
 .snap:hover {
   background: color-mix(in srgb, var(--c-accent) 22%, transparent);
+}
+
+.snap:active {
+  transform: scale(0.99);
 }
 
 .groups {

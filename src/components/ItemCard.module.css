@@ -46,18 +46,23 @@
 .iconBtn {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--r-sm);
   color: var(--c-text-muted);
   transition:
     color var(--t-fast),
-    background var(--t-fast);
+    background var(--t-fast),
+    transform var(--t-fast);
 }
 
 .iconBtn:hover {
   color: var(--c-text);
   background: var(--c-surface-2);
+}
+
+.iconBtn:active {
+  transform: scale(0.9);
 }
 
 /* Desktop with a real pointer: give the name the full cell width and reveal
