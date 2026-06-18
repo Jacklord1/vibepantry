@@ -16,6 +16,15 @@ const EXPIRY_PRESETS = [
   { label: '1wk', days: 7 },
 ] as const
 
+/** Compact label for a picked custom (non-preset) date, e.g. "8 Jul". */
+function shortDate(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const d = new Date(`${iso}T00:00:00`)
+  return Number.isNaN(d.getTime())
+    ? iso
+    : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+}
+
 type Props = {
   items: PantryItem[]
   onUpdate: (id: string, patch: RowPatch) => void
@@ -122,6 +131,18 @@ export function ReviewGrid({
                       </button>
                     )
                   })}
+                  {item.expiry &&
+                    !EXPIRY_PRESETS.some(
+                      (p) => isoDaysFromToday(p.days) === item.expiry,
+                    ) && (
+                      <button
+                        className={`${styles.expChip} ${styles.expChipOn}`}
+                        aria-pressed={true}
+                        onClick={() => onUpdate(item.id, { expiry: null })}
+                      >
+                        {shortDate(item.expiry)}
+                      </button>
+                    )}
                   <input
                     type="date"
                     className={styles.expDate}

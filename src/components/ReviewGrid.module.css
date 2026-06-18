@@ -178,13 +178,33 @@
   color: var(--c-accent);
 }
 
+/* Collapse the native date control to just its picker icon so the whole row
+   fits on one line on mobile (the full "dd/mm/yyyy" field wrapped to a 4th row).
+   Native tap still opens the platform date picker; a chosen custom date is shown
+   as its own chip above. color-scheme:dark renders the indicator light on our
+   dark surface. */
 .expDate {
-  font-size: var(--fs-xs);
-  color: var(--c-text-muted);
+  width: 34px;
+  min-width: 0;
+  padding: 4px;
+  color-scheme: dark;
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--r-pill);
-  padding: 2px var(--sp-2);
+}
+
+.expDate::-webkit-datetime-edit,
+.expDate::-webkit-inner-spin-button,
+.expDate::-webkit-clear-button {
+  display: none;
+  -webkit-appearance: none;
+}
+
+.expDate::-webkit-calendar-picker-indicator {
+  margin: 0;
+  padding: 0;
+  opacity: 0.7;
+  cursor: pointer;
 }
 
 .expDate:focus {

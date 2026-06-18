@@ -98,3 +98,19 @@ test('tapping the active chip again clears it (nothing required)', async ({ page
   await chip.click()
   await expect(chip).toHaveAttribute('aria-pressed', 'false')
 })
+
+test('a picked custom (non-preset) date shows as its own chip and clears on tap', async ({
+  page,
+}) => {
+  await openReview(page)
+  const custom = isoDaysFromToday(20) // not one of 2d/5d/1wk
+  await page.locator('input[type="date"]').fill(custom)
+  // Surfaces as a single pressed chip (no preset is active).
+  const pressed = page.locator('button[aria-pressed="true"]')
+  await expect(pressed).toHaveCount(1)
+  await expect(page.locator('input[type="date"]')).toHaveValue(custom)
+  // Tapping the custom chip clears the date.
+  await pressed.click()
+  await expect(page.locator('input[type="date"]')).toHaveValue('')
+  await expect(page.locator('button[aria-pressed="true"]')).toHaveCount(0)
+})
