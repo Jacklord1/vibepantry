@@ -1,54 +1,61 @@
-# Deploying VibePantry to Cloudflare Pages
+# Deploying VibePantry (Cloudflare Workers static assets)
 
-One-time setup to put VibePantry live at **vibepantry.com** with automatic
-deploys on every push to `main`. The build is a plain static site (`dist/`), so
-this is just connecting the repo and adding the domain.
+VibePantry is live at **https://vibepantry.com** — served by a Cloudflare
+**Worker** (`vibepantry`) with the static build (`dist/`) as its assets. Same
+model as `stwrd-site`. Landing is at `/`, the app at `/app`.
 
-> The app serves a **landing page at `/`** and the **app itself at `/app`**
-> (e.g. `vibepantry.com/app`). This is why the build is hosted at a domain root.
+## How it's wired
 
-## 1. Connect the repo
+- **`wrangler.toml`** — worker `vibepantry`, `[assets] directory = "./dist"`,
+  `not_found_handling = "single-page-application"` (serves `index.html` for any
+  non-asset path, so `/`, `/app`, and hard-refreshed deep links all resolve to
+  the path-gated bootstrap). `workers_dev = false` (canonical = the custom domain).
+- **`worker.js`** — a thin script in front of the assets that 301s
+  `www.vibepantry.com` → the apex, and otherwise serves the static assets
+  (`env.ASSETS`). It's the seam for any future server logic.
+- **Custom domain** `vibepantry.com` is attached to the worker (in the dashboard).
 
-1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** →
-   **Connect to Git**.
-2. Authorise GitHub if prompted, then select **`Jacklord1/vibepantry`**
-   (a private repo is fine).
-3. **Build settings:**
-   - Framework preset: **Vite** (or **None** — both work).
-   - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
-   - Root directory: leave as `/`.
-   - Node version: read automatically from **`.nvmrc`** (22). If a build ever
-     uses the wrong version, set an environment variable `NODE_VERSION = 22`.
-4. **Save and Deploy.** The first build runs from `main` and gives you a
-   `*.pages.dev` preview URL — open it and click **Launch app** to sanity-check.
+## Deploy
 
-## 2. Add the domain
+From the NUC (secrets resolved via 1Password):
 
-1. In the Pages project → **Custom domains** → **Set up a custom domain** →
-   enter **`vibepantry.com`** → follow the prompt.
-   Because the zone is already in this Cloudflare account, Pages creates the DNS
-   record and the TLS certificate automatically — no manual records needed.
-2. Add **`www.vibepantry.com`** as well, then point it at the apex with a
-   **redirect** (Rules → Redirect Rules, or a bulk redirect: `www.vibepantry.com/*`
-   → `https://vibepantry.com/$1`, 301). This keeps a single canonical host.
-3. Wait for the cert to issue (usually a few minutes). `https://vibepantry.com`
-   then serves the landing, and `https://vibepantry.com/app` serves the app.
+```bash
+cd ~/git/vibepantry
+npm run build
+op run --env-file=~/ai/.env.local -- npx wrangler deploy
+```
 
-## 3. From here on
+`wrangler` reads `CLOUDFLARE_API_TOKEN` (the `Edit zone DNS` token — has Workers
+Scripts edit) and `CLOUDFLARE_ACCOUNT_ID` from the env. Deploy takes ~5s; only
+changed assets upload.
 
-- **Auto-deploy:** every push to `main` rebuilds and redeploys. Pull requests get
-  their own preview URLs. Production branch = `main`.
-- The service worker uses `autoUpdate`, so a new deploy refreshes returning
-  visitors on their next load.
+## Outstanding: bind `www` (one dashboard step)
+
+The deploy token can edit the worker script but **not** manage Worker custom
+domains, so `www.vibepantry.com` isn't bound yet. To finish the `www → apex`
+redirect:
+
+1. Cloudflare → **Workers & Pages → `vibepantry` → Settings → Domains & Routes**
+   → **Add → Custom domain** → `www.vibepantry.com` → save.
+2. That's it — the deployed `worker.js` already 301s `www` to the apex.
+
+(Alternatively, add **Workers Routes: Edit** to the deploy token and the `routes`
+block in `wrangler.toml` will manage both domains automatically.)
+
+## Auto-deploy on push (optional, recommended for iteration)
+
+Right now deploys are manual (`wrangler deploy`). To get push-to-`main`
+auto-deploys, either:
+
+- **Workers Builds (dashboard):** Workers & Pages → `vibepantry` → Settings →
+  Builds → connect the GitHub repo, build command `npm run build`, deploy
+  command `npx wrangler deploy`; or
+- **GitHub Action:** `cloudflare/wrangler-action` on push to `main`, with
+  `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` as repo secrets.
 
 ## Notes
 
-- The **`proxy/`** folder is a *separate, optional* Cloudflare **Worker** (for
-  users who want to keep their API key server-side). Pages does **not** deploy it
-  — ignore it here. Deploy it on its own with `wrangler` only if you want it.
-- Visiting the landing at `/` pre-warms the app shell (the service worker installs
-  on first load), so the **Launch app** button is instant.
-- No secrets live in this repo or the build — VibePantry is bring-your-own-key;
-  each user pastes their own Anthropic key into the app, stored only in their
-  browser.
+- The optional Anthropic proxy in `proxy/` is a **separate** Worker
+  (`vibepantry-proxy`) — not deployed by this. Ignore unless you want it.
+- No secrets ship in the build — VibePantry is bring-your-own-key; each user
+  pastes their own Anthropic key into the app, stored only in their browser.

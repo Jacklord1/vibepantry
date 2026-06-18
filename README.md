@@ -47,10 +47,10 @@ landing page at `/` and the app itself at **`/app`** (the app uses hash routing,
 so deep links like `/app#/cook` and refreshes work with a simple SPA fallback).
 Host it three ways:
 
-**1. Any static host** (Cloudflare Pages, Netlify, Vercel, an S3 bucket + CDN):
-drop the contents of `dist/` in and add an SPA fallback to `index.html`. For
-Cloudflare Pages there's a step-by-step guide in **[SETUP.md](./SETUP.md)** —
-that's how the hosted site at vibepantry.com is deployed.
+**1. Any static host** (Cloudflare Workers/Pages, Netlify, Vercel, an S3 bucket +
+CDN): drop the contents of `dist/` in and add an SPA fallback to `index.html`.
+The live site at vibepantry.com runs on **Cloudflare Workers static assets** —
+the exact setup is in **[SETUP.md](./SETUP.md)**.
 
 **2. GitHub Pages:** works on a **user/org site or a custom domain** (served at
 the root). A `/<repo>/` project subpath won't work — the build uses absolute
