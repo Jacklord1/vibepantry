@@ -163,6 +163,14 @@
   transform: scale(0.98);
 }
 
+.ctaNote {
+  margin-top: var(--sp-1);
+  align-self: center;
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+  text-align: center;
+}
+
 .footer {
   margin-top: var(--sp-3);
   align-self: center;
@@ -247,6 +255,7 @@
   }
 
   .ctaTile,
+  .ctaNote,
   .footer {
     align-self: flex-start;
     text-align: left;

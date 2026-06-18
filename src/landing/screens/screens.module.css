@@ -52,12 +52,13 @@
 }
 
 .thumb {
+  width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: var(--r-sm);
-  background:
-    radial-gradient(circle at 30% 28%, var(--c-accent-soft), transparent 62%),
-    var(--c-surface-2);
   border: 1px solid var(--c-border);
+  background: var(--c-surface-2);
+  object-fit: cover;
+  display: block;
 }
 
 .addTile {
@@ -69,6 +70,7 @@
   color: var(--c-text-faint);
   font-size: var(--fs-h2);
   line-height: 1;
+  object-fit: initial;
 }
 
 /* --- Confirm screen --- */
@@ -112,16 +114,41 @@
 }
 
 .chipLabel {
-  font-size: var(--fs-xs);
-  color: var(--c-text-faint);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-display);
+  color: var(--c-text);
 }
 
 .chipRow {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sp-2);
+}
+
+/* "Vibe?" — connected segmented control, echoing the real Cook page. */
+.segment {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+}
+
+.seg {
+  flex: 1;
+  text-align: center;
+  font-size: var(--fs-xs);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--r-sm);
+  color: var(--c-text-muted);
+}
+
+.segOn {
+  background: var(--c-accent-soft);
+  color: var(--c-accent);
+  font-weight: var(--fw-semibold);
 }
 
 .chip {
