@@ -102,6 +102,15 @@
   flex-shrink: 0;
   max-width: 46%;
   appearance: none;
+  /* Compact dropdown chevron so the category reads as a picker, not a text
+     box (mirrors the Add form's select). */
+  background-image: linear-gradient(45deg, transparent 50%, var(--c-text-muted) 50%),
+    linear-gradient(135deg, var(--c-text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 14px) calc(50% - 2px),
+    calc(100% - 9px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: var(--sp-6);
 }
 
 .name:focus,
@@ -124,8 +133,8 @@
 .del {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
   border-radius: var(--r-sm);
   color: var(--c-text-muted);
@@ -154,6 +163,10 @@
 
 .accept:hover:not(:disabled) {
   background: var(--c-accent-hover);
+}
+
+.accept:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .accept:disabled {

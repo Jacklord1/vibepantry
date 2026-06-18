@@ -114,3 +114,21 @@ export async function seedAll(page: Page): Promise<void> {
   await writeStore(page, 'items', sampleItems())
   await writeStore(page, 'recipes', [sampleRecipe()])
 }
+
+/**
+ * Ungate the app via a same-origin "proxy" endpoint instead of a key. Pointing
+ * the app at a same-origin path means a mocked /v1/messages response needs no
+ * CORS dance — pair with page.route() on the same URL. Returns the URL written.
+ */
+export async function seedProxyEndpoint(page: Page, url = '/__mock_anthropic'): Promise<string> {
+  await page.goto('/app')
+  await page.waitForSelector('nav')
+  await writeStore(page, 'settings', [{ key: 'apiEndpoint', value: url }])
+  return url
+}
+
+/** A minimal valid 1×1 PNG, for setInputFiles where the app must decode it. */
+export const TINY_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/pLvAAAAAElFTkSuQmCC',
+  'base64',
+)
