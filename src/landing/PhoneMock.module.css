@@ -1,5 +1,7 @@
 /* Schematic phone frame. Height-driven so it always fits inside a 100dvh panel
-   (width is derived from aspect-ratio), then enlarged a touch on desktop. */
+   (width is derived from aspect-ratio), then enlarged a touch on desktop.
+   A status bar (top) + the app's bottom nav (bottom) bracket the screen so each
+   mock reads as a full, real app screen, not a floating fragment. */
 
 .frame {
   height: min(58dvh, 540px);
@@ -31,14 +33,99 @@
   border-radius: 28px;
   background: var(--c-bg);
   overflow: hidden;
-  padding: var(--sp-5) var(--sp-3) var(--sp-3);
   display: flex;
   flex-direction: column;
+}
+
+/* --- iOS-ish status bar --- */
+.statusbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-4) var(--sp-1);
+  font-size: 10px;
+}
+
+.clock {
+  font-weight: var(--fw-semibold);
+  color: var(--c-text);
+  letter-spacing: 0.02em;
+}
+
+.statusIcons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.signal,
+.wifi,
+.battery {
+  display: inline-block;
+  height: 8px;
+  background: var(--c-text-muted);
+  border-radius: 2px;
+}
+
+.signal {
+  width: 13px;
+  clip-path: polygon(0 100%, 25% 100%, 25% 60%, 50% 60%, 50% 30%, 75% 30%, 75% 0, 100% 0, 100% 100%);
+}
+.wifi {
+  width: 11px;
+}
+.battery {
+  width: 17px;
+  border-radius: 3px;
+}
+
+/* --- screen content: centred between the chrome so short screens look full --- */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   gap: var(--sp-3);
+  padding: var(--sp-3);
+}
+
+/* --- app bottom nav --- */
+.nav {
+  display: flex;
+  justify-content: space-around;
+  padding: var(--sp-2) var(--sp-2) var(--sp-3);
+  border-top: 1px solid var(--c-border);
+  background: var(--c-bg-elev);
+}
+
+.navItem {
+  position: relative;
+  padding-top: 5px;
+  font-size: 9px;
+  color: var(--c-text-faint);
+}
+
+.navOn {
+  color: var(--c-accent);
+  font-weight: var(--fw-semibold);
+}
+
+.navOn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 2px;
+  border-radius: var(--r-pill);
+  background: var(--c-accent);
 }
 
 @media (min-width: 700px) {
   .frame {
-    height: min(70dvh, 620px);
+    height: min(73dvh, 650px);
   }
 }
