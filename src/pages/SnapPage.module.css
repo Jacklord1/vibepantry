@@ -23,17 +23,16 @@
   line-height: var(--lh-body);
 }
 
-/* ---- capture zone ---- */
+/* ---- capture zone ----
+   Mobile (the primary surface): no drag affordance — phones can't drop files.
+   "Take photo" is a full-width hero with "Choose photos" beneath it. The dashed
+   drop-zone framing + "or drop images here" hint are pointer-device metaphors,
+   so they're gated behind (hover: hover) and (pointer: fine) below. */
 .zone {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-5) var(--sp-4);
-  border: 1px dashed var(--c-border-strong);
-  border-radius: var(--r-lg);
-  background: var(--c-surface);
-  transition: border-color var(--t-fast), background var(--t-fast);
+  align-items: stretch;
+  gap: var(--sp-3);
 }
 
 .zoneOver {
@@ -43,15 +42,57 @@
 
 .captureRow {
   display: flex;
+  flex-direction: column;
   gap: var(--sp-2);
-  flex-wrap: wrap;
-  justify-content: center;
   width: 100%;
 }
 
+/* Hero capture buttons fill the lane and sit big under the thumb. */
+.captureRow .primary,
+.captureRow .secondary {
+  width: 100%;
+  justify-content: center;
+  padding: var(--sp-4);
+}
+
 .hint {
+  display: none;
   font-size: var(--fs-sm);
   color: var(--c-text-faint);
+}
+
+/* Pointer devices get the drag-and-drop zone back: dashed frame, drop hint,
+   and natural-width buttons centred in the card. */
+@media (hover: hover) and (pointer: fine) {
+  .zone {
+    align-items: center;
+    gap: var(--sp-2);
+    padding: var(--sp-5) var(--sp-4);
+    border: 1px dashed var(--c-border-strong);
+    border-radius: var(--r-lg);
+    background: var(--c-surface);
+    transition: border-color var(--t-fast), background var(--t-fast);
+  }
+
+  .captureRow {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .captureRow .primary {
+    width: auto;
+    padding: var(--sp-3) var(--sp-5);
+  }
+
+  .captureRow .secondary {
+    width: auto;
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .hint {
+    display: block;
+  }
 }
 
 .primary {
@@ -69,6 +110,10 @@
   background: var(--c-accent-hover);
 }
 
+.primary:active {
+  transform: scale(0.98);
+}
+
 .secondary {
   display: inline-flex;
   align-items: center;
@@ -83,6 +128,10 @@
 
 .secondary:hover {
   background: var(--c-surface-2);
+}
+
+.secondary:active {
+  transform: scale(0.98);
 }
 
 /* ---- thumbnails ---- */
@@ -162,8 +211,9 @@
   right: var(--sp-1);
   display: grid;
   place-items: center;
-  width: 24px;
-  height: 24px;
+  /* Comfortable thumb target over a small thumbnail (was 24px). */
+  width: 32px;
+  height: 32px;
   border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--c-bg) 70%, transparent);
   backdrop-filter: blur(4px);
@@ -201,6 +251,10 @@
 
 .read:hover:not(:disabled) {
   background: var(--c-accent-hover);
+}
+
+.read:active:not(:disabled) {
+  transform: scale(0.99);
 }
 
 .read:disabled {
