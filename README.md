@@ -11,8 +11,9 @@ what you actually have — finishing in a clean, one-page printable recipe card.
 **It's a static, browser-only app. Bring your own Anthropic API key. Your data
 never leaves your browser.**
 
-<!-- Screenshots -->
-> _Screenshots coming soon — pantry, snap-to-extract grid, recipe options, and the printable card._
+![Snap screen: six pantry photos uploaded, 54 items extracted by vision into an editable review grid — each with a name, quantity and auto-assigned category](docs/img/snap-confirm.png)
+
+*Photograph your shelves and fridge — one shot holds many items. Vision pulls everything into one grid you confirm in a single pass.*
 
 ## Why it's different
 
@@ -25,6 +26,28 @@ never leaves your browser.**
   `dist/` on anything.
 - 🍳 **Catalogue so it can cook for you** — the pantry is a means to the recipe,
   never the product itself.
+
+## A look around
+
+![Pantry view: extracted items in a searchable grid grouped by category, with a "use soon" expiry banner and Cook/Snap actions](docs/img/pantry.png)
+
+*Your pantry, built from those photos — searchable, grouped by category, with use-soon expiry nudges.*
+
+![Cook screen: pick up to three pantry items to build around, choose a meal type and a vibe, set dietary and high-protein preferences](docs/img/cook-prefs.png)
+
+*Tell it what you fancy — build around a few items, pick a meal and a vibe, set dietary preferences.*
+
+![Recipe options: three suggested dishes makeable from the current pantry, each with time, servings, macros, the pantry items it uses and what you'll still need](docs/img/recipes.png)
+
+*Two or three dishes you can actually make right now — with macros, and a clear "uses" vs "need" split.*
+
+![Recipe detail: full ingredients and numbered method, with a Cook Mode button and a print icon](docs/img/recipe-card.png)
+
+*Every recipe opens to full ingredients and method — with a print option and a step-by-step Cook Mode.*
+
+![Cook Mode: full-screen, one-step-at-a-time recipe view with large serif text, progress dots and Back/Next navigation](docs/img/cook-mode.png)
+
+*Cook Mode walks you through one step at a time, hands-free, in big readable type.*
 
 ## Quick start (development)
 
