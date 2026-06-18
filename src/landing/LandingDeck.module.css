@@ -1,0 +1,273 @@
+/* Landing intro deck — native CSS scroll-snap, no JS pager. Cookbook tokens
+   only; dvh everywhere so mobile browser chrome never clips a panel. */
+
+.deck {
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: var(--c-bg);
+  scrollbar-width: none; /* cosmetic — still scrollable */
+}
+
+.deck::-webkit-scrollbar {
+  display: none;
+}
+
+.deck:focus-visible {
+  outline: none; /* scroll region itself; interactive controls keep their ring */
+}
+
+.panel {
+  min-height: 100dvh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-8) var(--sp-4);
+  padding-bottom: calc(var(--sp-8) + var(--safe-bottom));
+}
+
+/* --- Hero (panel 1) --- */
+.heroInner {
+  width: 100%;
+  max-width: var(--maxw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-4);
+}
+
+.wordmark {
+  font-size: clamp(2.75rem, 11vw, 4.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.accent {
+  color: var(--c-accent);
+}
+
+.promise {
+  font-size: var(--fs-h2);
+  max-width: 22ch;
+}
+
+.privacy {
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  max-width: 34ch;
+}
+
+.walk {
+  margin-top: var(--sp-4);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.02em;
+}
+
+.chevron {
+  width: 20px;
+  height: 20px;
+  animation: vpBob 1.8s ease-in-out infinite;
+}
+
+@keyframes vpBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* --- Split panels (2–5) --- */
+.splitInner {
+  width: 100%;
+  max-width: var(--maxw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-6);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  text-align: center;
+}
+
+.kicker {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  font-weight: var(--fw-semibold);
+}
+
+.title {
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
+  line-height: var(--lh-tight);
+}
+
+.body {
+  color: var(--c-text-muted);
+  font-size: var(--fs-body);
+  max-width: 34ch;
+  margin: 0 auto;
+}
+
+.mockWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.caption {
+  font-size: var(--fs-xs);
+  color: var(--c-text-faint);
+  letter-spacing: 0.02em;
+}
+
+/* CTA tile + footer live in the copy column of panel 5 */
+.ctaTile {
+  margin-top: var(--sp-2);
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-6);
+  border-radius: var(--r-pill);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-body);
+  box-shadow: var(--shadow-1);
+  text-decoration: none;
+  transition:
+    background var(--t-fast),
+    transform var(--t-fast);
+}
+
+.ctaTile:active {
+  transform: scale(0.98);
+}
+
+.footer {
+  margin-top: var(--sp-3);
+  align-self: center;
+  font-size: var(--fs-xs);
+  color: var(--c-text-faint);
+  text-align: center;
+}
+
+.footer a {
+  color: var(--c-text-muted);
+  text-decoration: none;
+}
+
+/* --- Progress dots --- */
+.dots {
+  position: fixed;
+  z-index: 5;
+  display: flex;
+  flex-direction: row;
+  gap: var(--sp-2);
+  left: 50%;
+  bottom: calc(var(--sp-4) + var(--safe-bottom));
+  transform: translateX(-50%);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border-radius: var(--r-pill);
+  background: var(--c-border-strong);
+  transition:
+    background var(--t-fast),
+    transform var(--t-fast);
+}
+
+.dot[aria-current='true'] {
+  background: var(--c-accent);
+  transform: scale(1.3);
+}
+
+/* --- Entrance reveals --- driven by data attributes so the rule reaches across
+   CSS-module files (the phone-screen elements live in screens.module.css).
+   Hidden start state is gated behind no-preference, so reduced-motion users get
+   the final state immediately even before the observer fires. */
+@media (prefers-reduced-motion: no-preference) {
+  :global([data-reveal]) {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity var(--t-med),
+      transform var(--t-med);
+    transition-delay: calc(var(--reveal-i, 0) * 70ms);
+  }
+
+  :global([data-revealed]) :global([data-reveal]) {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- Desktop: mock beside copy, dots to the right edge --- */
+@media (min-width: 700px) {
+  .splitInner {
+    max-width: var(--maxw-wide);
+    flex-direction: row;
+    gap: var(--sp-8);
+    justify-content: center;
+  }
+
+  .splitInner.flip {
+    flex-direction: row-reverse;
+  }
+
+  .copy {
+    flex: 1 1 0;
+    text-align: left;
+  }
+
+  .body {
+    margin: 0;
+  }
+
+  .ctaTile,
+  .footer {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  .dots {
+    left: auto;
+    bottom: auto;
+    right: var(--sp-5);
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 700px) and (hover: hover) {
+  .ctaTile:hover {
+    background: var(--c-accent-hover);
+  }
+
+  .dot:hover {
+    background: var(--c-text-muted);
+  }
+}
