@@ -14,7 +14,7 @@ export const RECIPE_MODELS = [
   { id: MODEL, label: 'Sonnet (quality)' },
   { id: HAIKU_MODEL, label: 'Haiku (cheap)' },
 ] as const
-export const DEFAULT_RECIPE_MODEL = MODEL
+export const DEFAULT_RECIPE_MODEL = HAIKU_MODEL
 const ENDPOINT = 'https://api.anthropic.com/v1/messages'
 const ANTHROPIC_VERSION = '2023-06-01'
 export const API_KEY_SETTING = 'apiKey'
