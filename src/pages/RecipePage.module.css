@@ -48,6 +48,10 @@
   background: var(--c-accent-hover);
 }
 
+.print:active {
+  transform: scale(0.98);
+}
+
 /* The action bar never prints. */
 @media print {
   .bar {

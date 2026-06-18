@@ -107,3 +107,7 @@ select.input {
 .cancel:hover {
   background: var(--c-surface-2);
 }
+
+.cancel:active {
+  transform: scale(0.98);
+}
