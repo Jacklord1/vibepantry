@@ -73,8 +73,11 @@ app shell loads offline (AI calls obviously still need a connection).
    middleman and no subscription).
 3. Create an API key (`sk-ant-…`) and paste it into VibePantry → **Settings**.
 
-The app uses `claude-sonnet-4-6` for both vision and recipes. Costs are small —
-a pantry photo or a recipe request is a fraction of a cent to a few cents.
+VibePantry uses Claude **Sonnet** to read your photos (extraction quality is
+make-or-break) and Claude **Haiku** by default to generate recipes — about a third of
+the cost, and you can flip it back to Sonnet in **Settings**. Costs are small: a pantry
+photo or a recipe request runs from a fraction of a cent to a few cents, billed by
+Anthropic directly.
 
 ## Optional: keep your key server-side (proxy)
 
@@ -83,6 +86,14 @@ Prefer not to hold the key in the browser? Deploy the tiny Cloudflare Worker in
 custom API endpoint** and leave the key field blank. The app will route calls
 through your Worker, which injects the key from a server-side secret. **The app
 never depends on this** — direct mode is the default.
+
+## How it works
+
+Two AI calls, everything else local. Snap a photo → Sonnet extracts the items into a
+grid you confirm → your pantry lives in IndexedDB → ask to cook → Haiku proposes
+recipes from what you have → printable card. The key never leaves your browser. Full
+walkthrough — the photo pipeline, the magic-link installer, the optional proxy, the
+deploy model — is in **[docs/HOW-IT-WORKS.md](./docs/HOW-IT-WORKS.md)**.
 
 ## Tech
 
@@ -101,3 +112,9 @@ These are deliberately **not** built:
 ## License
 
 [MIT](./LICENSE) — © 2026 Jack Archbold. Clone it, fork it, self-host it.
+
+---
+
+_VibePantry is an independent open-source project and is not affiliated with,
+endorsed by, or sponsored by Anthropic. "Claude" and "Anthropic" are trademarks of
+Anthropic, PBC._

@@ -1,7 +1,13 @@
 {
   "name": "vibepantry",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Snap your pantry, cook from what you have.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jacklord1/vibepantry.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

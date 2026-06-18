@@ -1,13 +1,13 @@
 # Cloudflare Worker (static assets) — serves the VibePantry build at vibepantry.com.
-# Same deploy model as stwrd-site. The app is a pure static SPA: landing at /,
-# app at /app (HashRouter handles /app#/... client-side). The
-# single-page-application not_found_handling serves index.html for any non-asset
-# path, so deep links and hard refreshes resolve to the path-gated bootstrap.
+# The app is a pure static SPA: landing at /, app at /app (HashRouter handles
+# /app#/... client-side). The single-page-application not_found_handling serves
+# index.html for any non-asset path, so deep links and hard refreshes resolve to
+# the path-gated bootstrap.
 #
 # A thin worker (worker.js) sits in front of the assets to 301 www → apex; it's
 # the seam for any future server logic. Assets are exposed to it as env.ASSETS.
 #
-# Deploy:  npm run build && op run --env-file=~/ai/.env.local -- npx wrangler deploy
+# Deploy:  npm run build && npx wrangler deploy
 # (CLOUDFLARE_API_TOKEN + CLOUDFLARE_ACCOUNT_ID come from the env).
 name = "vibepantry"
 main = "worker.js"
