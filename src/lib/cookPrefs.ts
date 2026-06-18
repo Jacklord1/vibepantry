@@ -31,6 +31,9 @@ export function mealTypeLabel(m: MealType): string {
   return MEAL_LABELS[m] ?? 'Any'
 }
 
+/** Settings key for the persisted, per-device dietary default. */
+export const DIETARY_SETTING = 'dietary'
+
 export type Dietary = 'vegetarian' | 'vegan' | 'gluten_free'
 
 export const DIETARY_OPTIONS: { value: Dietary; label: string }[] = [

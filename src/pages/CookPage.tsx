@@ -1,11 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { PantryItem, Recipe } from '../types'
-import { getAllItems, getAllRecipes, saveRecipes } from '../db'
+import { getAllItems, getAllRecipes, getSetting, saveRecipes } from '../db'
 import { hasApiAccess } from '../lib/anthropic'
 import { generateRecipes, VIBES } from '../lib/recipes'
 import type { Vibe } from '../lib/recipes'
-import { MEAL_TYPES, type MealType } from '../lib/cookPrefs'
+import {
+  DIETARY_OPTIONS,
+  DIETARY_SETTING,
+  MEAL_TYPES,
+  parseDietary,
+  type Dietary,
+  type MealType,
+} from '../lib/cookPrefs'
 import { expiringItems } from '../lib/expiry'
 import { PageHeader } from '../components/PageHeader'
 import { RecipeCard } from '../components/RecipeCard'
@@ -53,6 +60,7 @@ export function CookPage() {
 
   const [heroes, setHeroes] = useState<string[]>([])
   const [mealType, setMealType] = useState<MealType>('any')
+  const [dietary, setDietary] = useState<Dietary[]>([])
   const [vibe, setVibe] = useState<Vibe>('fast')
   const [macros, setMacros] = useState(false)
   const [useExpiring, setUseExpiring] = useState(
@@ -75,18 +83,23 @@ export function CookPage() {
 
   useEffect(() => {
     void (async () => {
-      const [access, all, recs] = await Promise.all([
+      const [access, all, recs, dietRaw] = await Promise.all([
         hasApiAccess(),
         getAllItems(),
         getAllRecipes(),
+        getSetting(DIETARY_SETTING),
       ])
       setGated(!access)
       const confirmed = all.filter((i) => i.confirmed)
       setItems(confirmed)
       setHistory(sortHistory(recs))
+      // Seed the per-cook dietary override from the saved default.
+      const diet = parseDietary(dietRaw)
+      setDietary(diet)
 
       // One-tap "Cook tonight" from the pantry: auto-generate straight away,
-      // biased to soon-to-expire items, with default prefs (surprise / fast).
+      // biased to soon-to-expire items, with default prefs (surprise / fast)
+      // — but still honour the saved dietary default.
       const soon = expiringItems(confirmed).map((s) => s.item.name)
       if (
         cookTonightRef.current &&
@@ -99,6 +112,7 @@ export function CookPage() {
           const generated = await generateRecipes(confirmed, {
             heroes: [],
             mealType: 'any',
+            dietary: diet,
             vibe: 'fast',
             macros: false,
             useSoon: soon,
@@ -127,6 +141,15 @@ export function CookPage() {
     })
   }
 
+  // Per-cook dietary override (seeded from the saved default); no cap.
+  function toggleDietary(value: Dietary) {
+    setDietary((prev) =>
+      prev.includes(value)
+        ? prev.filter((d) => d !== value)
+        : [...prev, value],
+    )
+  }
+
   async function cook() {
     if (!items) return
     if (!(await hasApiAccess())) {
@@ -141,6 +164,7 @@ export function CookPage() {
       const recs = await generateRecipes(items, {
         heroes,
         mealType,
+        dietary,
         vibe,
         macros,
         useSoon: useExpiring ? soonNames : undefined,
@@ -309,6 +333,25 @@ export function CookPage() {
               {v.label}
             </button>
           ))}
+        </div>
+      </section>
+
+      <section className={styles.q}>
+        <h2 className={styles.qTitle}>Dietary</h2>
+        <div className={styles.chips}>
+          {DIETARY_OPTIONS.map((d) => {
+            const on = dietary.includes(d.value)
+            return (
+              <button
+                key={d.value}
+                className={`${styles.chip} ${on ? styles.chipOn : ''}`}
+                aria-pressed={on}
+                onClick={() => toggleDietary(d.value)}
+              >
+                {d.label}
+              </button>
+            )
+          })}
         </div>
       </section>
 

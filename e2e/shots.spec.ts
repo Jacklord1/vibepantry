@@ -1,4 +1,4 @@
-import { test, type Page } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 import { seedAll, seedProxyEndpoint, writeStore, sampleItems, TINY_PNG } from './seed'
 
 // Three canned recipes for the cook-reveal mock (valid parse shape).
@@ -88,6 +88,43 @@ test.describe(() => {
     await page.goto('/app#/cook')
     await page.getByRole('heading', { name: 'Build around…' }).waitFor()
     await shoot(page, 'cook-prefs')
+  })
+
+  // Proves the richer Cook prefs (multi-hero · meal type · dietary) actually
+  // reach the recipe prompt: select them, then assert the request body carries
+  // them. Also shoots the new prefs UI for before/after.
+  test('cook prefs reach the prompt', async ({ page }) => {
+    const mockUrl = await seedProxyEndpoint(page)
+    await writeStore(page, 'items', sampleItems())
+
+    let capturedBody: string | null = null
+    await page.route(`**${mockUrl}`, async (route) => {
+      capturedBody = route.request().postData()
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ content: [{ type: 'text', text: RECIPES_JSON }] }),
+      })
+    })
+
+    await page.goto('/app#/cook')
+    await page.getByRole('heading', { name: 'Build around…' }).waitFor()
+
+    // Two heroes, a meal type, and a dietary constraint.
+    await page.getByRole('button', { name: 'Baby spinach' }).click()
+    await page.getByRole('button', { name: 'Cheddar' }).click()
+    await page.getByRole('button', { name: 'Dinner', exact: true }).click()
+    await page.getByRole('button', { name: 'Vegetarian' }).click()
+    await shoot(page, 'cook-prefs-selected')
+
+    await page.getByRole('button', { name: 'Cook up options' }).click()
+    await page.getByRole('heading', { name: 'Pick a recipe' }).waitFor()
+
+    const body = capturedBody ?? ''
+    expect(body).toContain('Baby spinach')
+    expect(body).toContain('Cheddar')
+    expect(body).toContain('Meal: Dinner')
+    expect(body).toContain('vegetarian')
   })
 
   test('recipe sheet', async ({ page }) => {

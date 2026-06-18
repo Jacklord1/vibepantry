@@ -19,6 +19,13 @@ import {
   RECIPE_MODEL_SETTING,
   RECIPE_MODELS,
 } from '../lib/anthropic'
+import {
+  DIETARY_OPTIONS,
+  DIETARY_SETTING,
+  parseDietary,
+  serialiseDietary,
+  type Dietary,
+} from '../lib/cookPrefs'
 import styles from './SettingsPage.module.css'
 
 const API_KEY = 'apiKey'
@@ -45,21 +52,25 @@ export function SettingsPage() {
   const [usageBuckets, setUsageBuckets] = useState<UsageBucket[]>([])
   const [usageNotice, setUsageNotice] = useState<Notice>(null)
   const [recipeModel, setRecipeModel] = useState<string>(DEFAULT_RECIPE_MODEL)
+  const [dietary, setDietary] = useState<Dietary[]>([])
 
   useEffect(() => {
     void (async () => {
-      const [key, endpoint, usageLog, savedRecipeModel] = await Promise.all([
-        getSetting(API_KEY),
-        getSetting(API_ENDPOINT),
-        getUsageLog(),
-        getSetting(RECIPE_MODEL_SETTING),
-      ])
+      const [key, endpoint, usageLog, savedRecipeModel, savedDietary] =
+        await Promise.all([
+          getSetting(API_KEY),
+          getSetting(API_ENDPOINT),
+          getUsageLog(),
+          getSetting(RECIPE_MODEL_SETTING),
+          getSetting(DIETARY_SETTING),
+        ])
       setSavedKey(key ?? null)
       setEditing(!key) // open the input when nothing is set yet
       setSavedEndpoint(endpoint ?? null)
       setEndpointInput(endpoint ?? '')
       setUsageBuckets(Object.values(usageLog.buckets))
       setRecipeModel(savedRecipeModel || DEFAULT_RECIPE_MODEL)
+      setDietary(parseDietary(savedDietary))
       setLoaded(true)
     })()
   }, [])
@@ -100,6 +111,17 @@ export function SettingsPage() {
   async function chooseRecipeModel(id: string) {
     await setSetting(RECIPE_MODEL_SETTING, id)
     setRecipeModel(id)
+  }
+
+  // Dietary is a standing default — persist on every tap (clear the setting
+  // when nothing's selected so it doesn't linger as an empty string).
+  async function toggleDietary(value: Dietary) {
+    const next = dietary.includes(value)
+      ? dietary.filter((d) => d !== value)
+      : [...dietary, value]
+    setDietary(next)
+    if (next.length) await setSetting(DIETARY_SETTING, serialiseDietary(next))
+    else await deleteSetting(DIETARY_SETTING)
   }
 
   async function saveKey() {
@@ -302,6 +324,30 @@ export function SettingsPage() {
               {m.label}
             </button>
           ))}
+        </div>
+      </section>
+
+      {/* ---- Dietary ---- */}
+      <section className={styles.section}>
+        <h2 className={styles.h2}>Dietary</h2>
+        <p className={styles.note}>
+          A standing preference applied to every cook. You can still override it
+          per-cook on the Cook page. Leave all off for no restriction.
+        </p>
+        <div className={styles.chips}>
+          {DIETARY_OPTIONS.map((d) => {
+            const on = dietary.includes(d.value)
+            return (
+              <button
+                key={d.value}
+                className={`${styles.chip} ${on ? styles.chipOn : ''}`}
+                aria-pressed={on}
+                onClick={() => toggleDietary(d.value)}
+              >
+                {d.label}
+              </button>
+            )
+          })}
         </div>
       </section>
 

@@ -5,7 +5,12 @@ import {
   RECIPE_MODEL_SETTING,
 } from './anthropic'
 import { getSetting } from '../db'
-import { mealTypeLabel, type MealType } from './cookPrefs'
+import {
+  dietaryLabel,
+  mealTypeLabel,
+  type Dietary,
+  type MealType,
+} from './cookPrefs'
 import { extractJsonObject } from './json'
 import { uuid } from './id'
 
@@ -20,6 +25,8 @@ export type RecipePrefs = {
   vibe: Vibe
   /** Which meal these recipes are for; 'any' = no constraint. */
   mealType: MealType
+  /** Hard dietary constraints every recipe must satisfy. Empty = none. */
+  dietary: Dietary[]
   /** Show macros per serving + lean high-protein. */
   macros: boolean
   /** Names of soon-to-expire items to prioritise (optional). */
@@ -40,6 +47,11 @@ function recipeSystem(prefs: RecipePrefs): string {
     prefs.mealType !== 'any'
       ? `\n- Every recipe must suit ${mealTypeLabel(prefs.mealType).toLowerCase()} — propose only ${mealTypeLabel(prefs.mealType).toLowerCase()} dishes.`
       : ''
+  const dietaryRule = prefs.dietary.length
+    ? `\n- HARD DIETARY REQUIREMENT: every recipe must be ${prefs.dietary
+        .map(dietaryLabel)
+        .join(' and ')}. Exclude any ingredient that breaks this — no exceptions, even if it's in the pantry.`
+    : ''
   return `You are a practical, resourceful home cook. You are given the user's current pantry (item names with rough quantities, sometimes per-100g macros) and a few preferences. Propose 2–3 recipes they can make MOSTLY from what they already have.
 
 Return ONLY a JSON object of this exact shape — no prose, no explanation, no markdown code fences:
@@ -66,7 +78,7 @@ Rules:
   - clean = lighter, fresh, whole-food leaning.
   - comfort = hearty, cosy, satisfying.
 - If asked to prioritise soon-to-expire items, make sure most recipes use them.
-- Keep "steps" concise and in order.${mealRule}
+- Keep "steps" concise and in order.${mealRule}${dietaryRule}
 ${macroRule}
 - Return only the JSON object.`
 }
@@ -196,6 +208,11 @@ export async function generateRecipes(
     `- Vibe: ${prefs.vibe}\n` +
     (prefs.mealType !== 'any'
       ? `- Meal: ${mealTypeLabel(prefs.mealType)} only.\n`
+      : '') +
+    (prefs.dietary.length
+      ? `- Dietary (hard requirement): every recipe must be ${prefs.dietary
+          .map(dietaryLabel)
+          .join(' and ')}.\n`
       : '') +
     (prefs.macros ? `- Show macros per serving and lean high-protein.\n` : '') +
     (prefs.useSoon && prefs.useSoon.length

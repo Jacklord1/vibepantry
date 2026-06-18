@@ -147,6 +147,43 @@ details[open] .summary {
   color: var(--c-danger);
 }
 
+/* Multi-select pills (Dietary default) — mirrors the Cook page chips. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.chip {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-pill);
+  background: var(--c-bg-elev);
+  border: 1px solid var(--c-border);
+  color: var(--c-text);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-sm);
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast),
+    transform var(--t-fast);
+}
+
+@media (hover: hover) {
+  .chip:hover {
+    background: var(--c-surface-2);
+  }
+}
+
+.chip:active {
+  transform: scale(0.97);
+}
+
+.chipOn {
+  background: var(--c-accent-soft);
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
 .usageRow {
   display: flex;
   align-items: center;
