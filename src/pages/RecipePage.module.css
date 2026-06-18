@@ -33,7 +33,14 @@
   color: var(--c-text);
 }
 
-.print {
+.barActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* "Cook Mode" is the star action on this screen — the amber primary. */
+.cookMode {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
@@ -42,14 +49,36 @@
   color: var(--c-text-on-accent);
   font-weight: var(--fw-semibold);
   border-radius: var(--r-md);
+  transition: background var(--t-fast);
 }
 
-.print:hover {
+.cookMode:hover {
   background: var(--c-accent-hover);
 }
 
-.print:active {
+.cookMode:active {
   transform: scale(0.98);
+}
+
+/* Print steps back to a compact secondary icon button. */
+.print {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--c-bg-elev);
+  border: 1px solid var(--c-border);
+  color: var(--c-text);
+  transition: background var(--t-fast);
+}
+
+.print:hover {
+  background: var(--c-surface-2);
+}
+
+.print:active {
+  transform: scale(0.96);
 }
 
 /* The action bar never prints. */

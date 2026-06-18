@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import type { Recipe } from '../types'
 import { getRecipe } from '../db'
 import { RecipeSheet } from '../components/RecipeSheet'
-import { IconChevronLeft, IconPrint } from '../components/Icons'
+import { CookMode } from '../components/CookMode'
+import { IconChevronLeft, IconCook, IconPrint } from '../components/Icons'
 import styles from './RecipePage.module.css'
 
 export function RecipePage() {
@@ -11,6 +12,7 @@ export function RecipePage() {
   const navigate = useNavigate()
   // undefined = loading, null = not found
   const [recipe, setRecipe] = useState<Recipe | null | undefined>(undefined)
+  const [cooking, setCooking] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -49,13 +51,28 @@ export function RecipePage() {
           <IconChevronLeft size={18} />
           Back
         </button>
-        <button className={styles.print} onClick={() => window.print()}>
-          <IconPrint size={18} />
-          Print / Save as PDF
-        </button>
+        <div className={styles.barActions}>
+          {recipe.steps.length > 0 && (
+            <button className={styles.cookMode} onClick={() => setCooking(true)}>
+              <IconCook size={18} />
+              Cook Mode
+            </button>
+          )}
+          <button
+            className={styles.print}
+            onClick={() => window.print()}
+            aria-label="Print or save as PDF"
+          >
+            <IconPrint size={18} />
+          </button>
+        </div>
       </div>
 
       <RecipeSheet recipe={recipe} />
+
+      {cooking && (
+        <CookMode recipe={recipe} onClose={() => setCooking(false)} />
+      )}
     </>
   )
 }

@@ -132,6 +132,14 @@ test.describe(() => {
     await shoot(page, 'cook-options')
   })
 
+  test('cook mode', async ({ page }) => {
+    await seedAll(page)
+    await page.goto('/app#/recipe/seed-recipe')
+    await page.getByRole('button', { name: 'Cook Mode' }).click()
+    await page.getByText('Step 1 of').waitFor()
+    await shoot(page, 'cook-mode')
+  })
+
   test('cook tonight', async ({ page }) => {
     const mockUrl = await seedProxyEndpoint(page)
     await writeStore(page, 'items', sampleItems())
