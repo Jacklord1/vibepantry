@@ -42,16 +42,20 @@ redirect:
 (Alternatively, add **Workers Routes: Edit** to the deploy token and the `routes`
 block in `wrangler.toml` will manage both domains automatically.)
 
-## Auto-deploy on push (optional, recommended for iteration)
+## Auto-deploy (wired)
 
-Right now deploys are manual (`wrangler deploy`). To get push-to-`main`
-auto-deploys, either:
+Push-to-deploy is live via **GitHub Actions** (`.github/workflows/deploy.yml`):
 
-- **Workers Builds (dashboard):** Workers & Pages → `vibepantry` → Settings →
-  Builds → connect the GitHub repo, build command `npm run build`, deploy
-  command `npx wrangler deploy`; or
-- **GitHub Action:** `cloudflare/wrangler-action` on push to `main`, with
-  `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` as repo secrets.
+- **Automatic:** every push/merge to `main` builds (`npm run build`) and runs
+  `wrangler deploy` (~1 min). Branches don't deploy — merging to `main` is the
+  release.
+- **Manual:** GitHub → repo → **Actions → Deploy → Run workflow**, or
+  `gh workflow run deploy.yml -R Jacklord1/vibepantry`.
+- Repo secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` are set.
+  (Security follow-up: the CI token is currently the broad `Edit zone DNS` token —
+  swap it for a Workers-only least-priv token when convenient.)
+
+A direct `wrangler deploy` from the NUC (see above) still works any time.
 
 ## Notes
 
