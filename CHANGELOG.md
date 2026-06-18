@@ -4,7 +4,7 @@
 - Mobile-first GUI polish pass. Sweats the phone (the primary surface) without regressing the desktop layer or the locked Cookbook theme. E2E + build stay green.
   - **Tooling**: stood up Playwright (390×844 + 360 viewports) — a deterministic smoke suite (the green gate) plus an IndexedDB-seeding screenshot rig for before/after audits.
   - **Snap**: "Take photo" is now a full-width hero with "Choose photos" beneath; the dashed drop-zone + "or drop images here" are gated behind (hover: hover)/(pointer: fine) since phones can't drop files; thumbnail remove (×) target 24→32px.
-  - **Cook**: hero chips lifted to a ≥44px tap target; chip/segment hover backgrounds gated to pointer devices so they don't stick after a tap.
+  - **Cook**: chip/segment hover backgrounds gated to pointer devices so they don't stick after a tap.
   - **Bottom nav**: clearer active tab — accent top bar + semibold label, not colour alone.
   - **Review grid**: category select gains a dropdown chevron (was a bare box); per-row delete 38→44px.
   - **Pantry**: always-visible card edit/delete grown 38→44px.

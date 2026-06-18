@@ -47,8 +47,7 @@
 }
 
 .chip {
-  /* Vertical padding lifts the chip to a ≥44px thumb target. */
-  padding: var(--sp-3) var(--sp-4);
+  padding: var(--sp-2) var(--sp-4);
   border-radius: var(--r-pill);
   background: var(--c-surface);
   border: 1px solid var(--c-border);
