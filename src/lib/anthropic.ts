@@ -6,6 +6,15 @@ import { recordUsage, type UsageKind } from './usage'
 // Proven in Phase 2 Step 0: this round-trips 200 (no CORS wall).
 
 export const MODEL = 'claude-sonnet-4-6'
+
+/** Recipe-model selection (Settings toggle). Vision always uses MODEL. */
+export const HAIKU_MODEL = 'claude-haiku-4-5'
+export const RECIPE_MODEL_SETTING = 'recipeModel'
+export const RECIPE_MODELS = [
+  { id: MODEL, label: 'Sonnet (quality)' },
+  { id: HAIKU_MODEL, label: 'Haiku (cheap)' },
+] as const
+export const DEFAULT_RECIPE_MODEL = MODEL
 const ENDPOINT = 'https://api.anthropic.com/v1/messages'
 const ANTHROPIC_VERSION = '2023-06-01'
 export const API_KEY_SETTING = 'apiKey'
@@ -80,6 +89,8 @@ type CallArgs = {
   maxTokens?: number
   /** Which call this is — used to bucket token usage. */
   kind: UsageKind
+  /** Model override; defaults to MODEL (Sonnet). Vision omits it. */
+  model?: string
 }
 
 /**
@@ -92,6 +103,7 @@ export async function callMessages({
   messages,
   maxTokens = 3000,
   kind,
+  model = MODEL,
 }: CallArgs): Promise<string> {
   const [apiKey, apiBase] = await Promise.all([
     getSetting(API_KEY_SETTING),
@@ -115,7 +127,7 @@ export async function callMessages({
       method: 'POST',
       headers,
       body: JSON.stringify({
-        model: MODEL,
+        model,
         max_tokens: maxTokens,
         system,
         messages,
@@ -147,7 +159,7 @@ export async function callMessages({
   if (u && typeof u.input_tokens === 'number' && typeof u.output_tokens === 'number') {
     void recordUsage({
       kind,
-      model: MODEL,
+      model,
       inputTokens: u.input_tokens,
       outputTokens: u.output_tokens,
     })

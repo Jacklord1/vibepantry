@@ -14,6 +14,11 @@ import {
   resetUsage,
   type UsageBucket,
 } from '../lib/usage'
+import {
+  DEFAULT_RECIPE_MODEL,
+  RECIPE_MODEL_SETTING,
+  RECIPE_MODELS,
+} from '../lib/anthropic'
 import styles from './SettingsPage.module.css'
 
 const API_KEY = 'apiKey'
@@ -39,19 +44,22 @@ export function SettingsPage() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [usageBuckets, setUsageBuckets] = useState<UsageBucket[]>([])
   const [usageNotice, setUsageNotice] = useState<Notice>(null)
+  const [recipeModel, setRecipeModel] = useState<string>(DEFAULT_RECIPE_MODEL)
 
   useEffect(() => {
     void (async () => {
-      const [key, endpoint, usageLog] = await Promise.all([
+      const [key, endpoint, usageLog, savedRecipeModel] = await Promise.all([
         getSetting(API_KEY),
         getSetting(API_ENDPOINT),
         getUsageLog(),
+        getSetting(RECIPE_MODEL_SETTING),
       ])
       setSavedKey(key ?? null)
       setEditing(!key) // open the input when nothing is set yet
       setSavedEndpoint(endpoint ?? null)
       setEndpointInput(endpoint ?? '')
       setUsageBuckets(Object.values(usageLog.buckets))
+      setRecipeModel(savedRecipeModel || DEFAULT_RECIPE_MODEL)
       setLoaded(true)
     })()
   }, [])
@@ -87,6 +95,11 @@ export function SettingsPage() {
     await resetUsage()
     setUsageBuckets([])
     setUsageNotice({ kind: 'ok', text: 'Usage history cleared.' })
+  }
+
+  async function chooseRecipeModel(id: string) {
+    await setSetting(RECIPE_MODEL_SETTING, id)
+    setRecipeModel(id)
   }
 
   async function saveKey() {
@@ -267,6 +280,29 @@ export function SettingsPage() {
             {dataNotice.text}
           </p>
         )}
+      </section>
+
+      {/* ---- Recipe model ---- */}
+      <section className={styles.section}>
+        <h2 className={styles.h2}>Recipe model</h2>
+        <p className={styles.note}>
+          Which model writes your recipes. Haiku is ~3× cheaper; Sonnet is a
+          little sharper. Photo scanning always uses Sonnet — quality matters
+          most there.
+        </p>
+        <div className={styles.keyActions}>
+          {RECIPE_MODELS.map((m) => (
+            <button
+              key={m.id}
+              className={
+                recipeModel === m.id ? styles.primary : styles.secondary
+              }
+              onClick={() => chooseRecipeModel(m.id)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
       </section>
 
       {/* ---- API usage ---- */}

@@ -1,5 +1,10 @@
 import type { Macros, PantryItem, Recipe } from '../types'
-import { callMessages } from './anthropic'
+import {
+  callMessages,
+  DEFAULT_RECIPE_MODEL,
+  RECIPE_MODEL_SETTING,
+} from './anthropic'
+import { getSetting } from '../db'
 import { extractJsonObject } from './json'
 import { uuid } from './id'
 
@@ -186,9 +191,12 @@ export async function generateRecipes(
       : '') +
     `\nGive me 2–3 recipes I can cook mostly from this.`
 
+  const recipeModel =
+    (await getSetting(RECIPE_MODEL_SETTING)) || DEFAULT_RECIPE_MODEL
   const text = await callMessages({
     system: recipeSystem(prefs.macros),
     kind: 'recipe',
+    model: recipeModel,
     // 2–3 full recipes (ingredients + steps) blow past ~1500 and truncate the
     // JSON mid-array (verified). 3000 gives headroom like the vision call.
     maxTokens: 3000,
