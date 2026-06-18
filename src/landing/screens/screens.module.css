@@ -73,10 +73,11 @@
   object-fit: initial;
 }
 
-/* --- Confirm screen --- */
+/* --- Confirm screen --- echoes the real ItemCard: name over qty, ghost actions */
 .itemRow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-3);
   background: var(--c-surface);
@@ -84,26 +85,36 @@
   border-radius: var(--r-md);
 }
 
-.itemDot {
-  width: 22px;
-  height: 22px;
-  border-radius: var(--r-pill);
-  background: var(--c-accent-soft);
-  flex-shrink: 0;
+.itemMain {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 
 .itemName {
-  flex: 1;
   font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
   color: var(--c-text);
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .itemQty {
   font-size: var(--fs-xs);
   color: var(--c-text-muted);
-  background: var(--c-bg-elev);
-  padding: 1px var(--sp-2);
-  border-radius: var(--r-pill);
+}
+
+.itemActions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+  color: var(--c-text-faint);
+}
+
+.itemActions svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* --- Taps screen --- */
@@ -146,18 +157,26 @@
 }
 
 .segOn {
-  background: var(--c-accent-soft);
-  color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
   font-weight: var(--fw-semibold);
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: var(--fs-xs);
   padding: var(--sp-1) var(--sp-3);
   border-radius: var(--r-pill);
   border: 1px solid var(--c-border);
   color: var(--c-text-muted);
   background: var(--c-surface);
+}
+
+.chip svg {
+  width: 12px;
+  height: 12px;
 }
 
 .chipOn {
@@ -168,7 +187,7 @@
 }
 
 .askBtn {
-  margin-top: auto;
+  margin-top: var(--sp-2);
   width: 100%;
   padding: var(--sp-3);
   border-radius: var(--r-md);
@@ -197,13 +216,31 @@
   line-height: var(--lh-tight);
 }
 
+.recipeBlurb {
+  font-size: var(--fs-xs);
+  color: var(--c-text-muted);
+}
+
 .recipeMeta {
   display: flex;
+  align-items: center;
   gap: var(--sp-2);
+  margin-top: 1px;
   font-size: var(--fs-xs);
   color: var(--c-accent);
+  white-space: nowrap;
 }
 
 .sep {
   color: var(--c-text-faint);
+}
+
+.recipeTag {
+  align-self: flex-start;
+  margin-top: 3px;
+  font-size: 10px;
+  padding: 1px var(--sp-2);
+  border-radius: var(--r-pill);
+  background: var(--c-herb-soft);
+  color: var(--c-herb);
 }

@@ -30,6 +30,14 @@
 }
 
 /* --- Hero (panel 1) --- */
+.hero {
+  background: radial-gradient(
+    72% 55% at 50% 42%,
+    var(--c-accent-soft),
+    transparent 72%
+  );
+}
+
 .heroInner {
   width: 100%;
   max-width: var(--maxw);
@@ -44,6 +52,7 @@
   font-size: clamp(2.75rem, 11vw, 4.5rem);
   letter-spacing: -0.03em;
   line-height: 1;
+  text-wrap: balance;
 }
 
 .accent {
@@ -52,7 +61,8 @@
 
 .promise {
   font-size: var(--fs-h2);
-  max-width: 22ch;
+  max-width: 26ch;
+  text-wrap: balance;
 }
 
 .privacy {
@@ -89,6 +99,101 @@
   }
 }
 
+/* --- Hero loop motif: snap -> confirm -> cook, the amber pulse flowing through --- */
+.loop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.loopStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+  color: var(--c-text-muted);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+}
+
+.loopStep svg {
+  width: 14px;
+  height: 14px;
+}
+
+.loopArrow {
+  width: 16px;
+  height: 16px;
+  color: var(--c-text-faint);
+  flex-shrink: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .loopStep {
+    animation: vpLoopPulse 3.6s ease-in-out infinite;
+    animation-delay: calc(var(--step, 0) * 1.2s);
+  }
+}
+
+@keyframes vpLoopPulse {
+  0%,
+  10% {
+    background: var(--c-surface);
+    border-color: var(--c-border);
+    color: var(--c-text-muted);
+  }
+  18%,
+  26% {
+    background: var(--c-accent-soft);
+    border-color: var(--c-accent);
+    color: var(--c-accent);
+  }
+  34%,
+  100% {
+    background: var(--c-surface);
+    border-color: var(--c-border);
+    color: var(--c-text-muted);
+  }
+}
+
+/* --- Persistent CTA: fades in once you're past the hero --- */
+.persistCta {
+  position: fixed;
+  z-index: 6;
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-3));
+  right: var(--sp-4);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  color: var(--c-accent);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+  box-shadow: var(--shadow-1);
+  opacity: 0;
+  transform: translateY(-6px);
+  pointer-events: none;
+  transition:
+    opacity var(--t-med),
+    transform var(--t-med);
+}
+
+.persistCta[data-shown] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
 /* --- Split panels (2–5) --- */
 .splitInner {
   width: 100%;
@@ -117,6 +222,7 @@
 .title {
   font-size: clamp(1.6rem, 6vw, 2.4rem);
   line-height: var(--lh-tight);
+  text-wrap: balance;
 }
 
 .body {
@@ -124,6 +230,7 @@
   font-size: var(--fs-body);
   max-width: 34ch;
   margin: 0 auto;
+  text-wrap: pretty;
 }
 
 .mockWrap {
@@ -197,19 +304,21 @@
 }
 
 .dot {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   padding: 0;
   border-radius: var(--r-pill);
-  background: var(--c-border-strong);
+  background: var(--c-text-faint);
   transition:
     background var(--t-fast),
-    transform var(--t-fast);
+    transform var(--t-fast),
+    box-shadow var(--t-fast);
 }
 
 .dot[aria-current='true'] {
   background: var(--c-accent);
-  transform: scale(1.3);
+  transform: scale(1.4);
+  box-shadow: 0 0 0 4px var(--c-accent-soft);
 }
 
 /* --- Entrance reveals --- driven by data attributes so the rule reaches across
@@ -235,8 +344,9 @@
 /* --- Desktop: mock beside copy, dots to the right edge --- */
 @media (min-width: 700px) {
   .splitInner {
-    max-width: var(--maxw-wide);
+    max-width: 860px;
     flex-direction: row;
+    align-items: center;
     gap: var(--sp-8);
     justify-content: center;
   }
@@ -246,7 +356,7 @@
   }
 
   .copy {
-    flex: 1 1 0;
+    flex: 0 1 380px;
     text-align: left;
   }
 
@@ -278,5 +388,10 @@
 
   .dot:hover {
     background: var(--c-text-muted);
+  }
+
+  .persistCta:hover {
+    border-color: var(--c-accent);
+    background: var(--c-surface-2);
   }
 }
