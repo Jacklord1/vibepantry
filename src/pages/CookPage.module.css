@@ -47,7 +47,8 @@
 }
 
 .chip {
-  padding: var(--sp-2) var(--sp-4);
+  /* Vertical padding lifts the chip to a ≥44px thumb target. */
+  padding: var(--sp-3) var(--sp-4);
   border-radius: var(--r-pill);
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -56,11 +57,20 @@
   font-size: var(--fs-sm);
   transition:
     background var(--t-fast),
-    border-color var(--t-fast);
+    border-color var(--t-fast),
+    transform var(--t-fast);
 }
 
-.chip:hover {
-  background: var(--c-surface-2);
+/* Hover only where there's a real pointer — otherwise the background sticks
+   on the tapped chip until you tap elsewhere. */
+@media (hover: hover) {
+  .chip:hover {
+    background: var(--c-surface-2);
+  }
+}
+
+.chip:active {
+  transform: scale(0.97);
 }
 
 .chipOn {
@@ -89,8 +99,10 @@
     color var(--t-fast);
 }
 
-.seg:hover {
-  color: var(--c-text);
+@media (hover: hover) {
+  .seg:hover {
+    color: var(--c-text);
+  }
 }
 
 .segOn {
@@ -167,6 +179,10 @@
   background: var(--c-accent-hover);
 }
 
+.cook:active {
+  transform: scale(0.99);
+}
+
 .primary {
   display: inline-flex;
   align-items: center;
@@ -180,6 +196,11 @@
 
 .primary:hover {
   background: var(--c-accent-hover);
+}
+
+.primary:active,
+.secondary:active {
+  transform: scale(0.98);
 }
 
 .secondary {
