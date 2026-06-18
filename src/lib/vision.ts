@@ -101,6 +101,7 @@ export async function extractItemsFromPhoto(
   const img = await downscaleToBase64(file)
   const text = await callMessages({
     system: VISION_SYSTEM,
+    kind: 'vision',
     maxTokens: 3000,
     messages: [
       {

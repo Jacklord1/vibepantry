@@ -188,6 +188,7 @@ export async function generateRecipes(
 
   const text = await callMessages({
     system: recipeSystem(prefs.macros),
+    kind: 'recipe',
     // 2–3 full recipes (ingredients + steps) blow past ~1500 and truncate the
     // JSON mid-array (verified). 3000 gives headroom like the vision call.
     maxTokens: 3000,

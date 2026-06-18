@@ -1,4 +1,5 @@
 import { getSetting } from '../db'
+import { recordUsage, type UsageKind } from './usage'
 
 // Browser-direct Anthropic client. The user's key is read from IndexedDB and
 // sent only to api.anthropic.com, using Anthropic's supported in-browser flag.
@@ -77,6 +78,8 @@ type CallArgs = {
   system: string
   messages: AnthropicMessage[]
   maxTokens?: number
+  /** Which call this is — used to bucket token usage. */
+  kind: UsageKind
 }
 
 /**
@@ -88,6 +91,7 @@ export async function callMessages({
   system,
   messages,
   maxTokens = 3000,
+  kind,
 }: CallArgs): Promise<string> {
   const [apiKey, apiBase] = await Promise.all([
     getSetting(API_KEY_SETTING),
@@ -136,6 +140,19 @@ export async function callMessages({
   }
 
   const body = await res.json()
+
+  // Record token usage (bucketed kind:model). Best-effort — proxy/local
+  // endpoints may omit `usage`, so skip silently when it's absent.
+  const u = body?.usage
+  if (u && typeof u.input_tokens === 'number' && typeof u.output_tokens === 'number') {
+    void recordUsage({
+      kind,
+      model: MODEL,
+      inputTokens: u.input_tokens,
+      outputTokens: u.output_tokens,
+    })
+  }
+
   const text: string = (body?.content ?? [])
     .filter((b: { type?: string }) => b?.type === 'text')
     .map((b: { text?: string }) => b.text ?? '')
