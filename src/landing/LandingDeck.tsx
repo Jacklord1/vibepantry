@@ -161,7 +161,7 @@ export function LandingDeck() {
         title="Snap your shelves"
         body="Bulk-photograph everything at once — fridge, pantry, spice rack. Vision reads it all into a list. No typing."
         caption="bulk-photograph everything at once"
-        mockLabel="Phone showing bulk photo capture: a take-photo button, three thumbnails and an add tile"
+        mockLabel="Phone showing bulk photo capture: a take-photo button, three captured shelf photos (spice rack, pantry, fridge) and an add tile"
         screen={<SnapScreen />}
       />
 
@@ -186,7 +186,7 @@ export function LandingDeck() {
         revealed={seen.has(3)}
         kicker="03 · Taps"
         title="One or two taps"
-        body="Tell it how you eat — diet and time. One tap each. No forms, no accounts, no sign-up."
+        body="Pick a hero ingredient and a vibe — a tap each. No forms, no accounts, no sign-up."
         caption="no forms, no accounts"
         mockLabel="Phone showing diet and time preference chips, one selected in each row"
         screen={<TapsScreen />}
@@ -206,10 +206,13 @@ export function LandingDeck() {
         screen={<CookScreen />}
       >
         <a className={styles.ctaTile} href="/app" data-reveal style={ri(3)}>
-          Bring your own key
+          Open the app
           <span aria-hidden="true">→</span>
         </a>
-        <p className={styles.footer} data-reveal style={ri(4)}>
+        <p className={styles.ctaNote} data-reveal style={ri(4)}>
+          Bring your own key — no account, no sign-up.
+        </p>
+        <p className={styles.footer} data-reveal style={ri(5)}>
           <a href={REPO} target="_blank" rel="noreferrer">
             GitHub
           </a>{' '}
