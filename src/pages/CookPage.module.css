@@ -40,6 +40,13 @@
   margin-bottom: var(--sp-3);
 }
 
+/* Sub-label under a question heading (e.g. the hero soft-cap hint). */
+.hint {
+  font-size: var(--fs-sm);
+  color: var(--c-text-muted);
+  margin: calc(var(--sp-2) * -1) 0 var(--sp-3);
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;

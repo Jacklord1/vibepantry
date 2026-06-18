@@ -14,8 +14,8 @@ import { uuid } from './id'
 
 export type Vibe = 'fast' | 'clean' | 'comfort'
 export type RecipePrefs = {
-  /** A pantry item name to star, or null for "surprise me". */
-  hero: string | null
+  /** Pantry item names to build around. Empty = "surprise me". Soft-cap ~3. */
+  heroes: string[]
   vibe: Vibe
   /** Show macros per serving + lean high-protein. */
   macros: boolean
@@ -29,8 +29,8 @@ export const VIBES: { value: Vibe; label: string }[] = [
   { value: 'comfort', label: 'Comfort' },
 ]
 
-function recipeSystem(macros: boolean): string {
-  const macroRule = macros
+function recipeSystem(prefs: RecipePrefs): string {
+  const macroRule = prefs.macros
     ? `- The user wants macros: set "macrosPerServing" to a best-estimate object { "kcal": number, "protein_g": number, "carbs_g": number, "fat_g": number } per serving. Lean toward higher-protein recipes and add a "high-protein" tag where it genuinely fits. Where a pantry item lists per-100g macros, use them to sharpen your estimate.`
     : `- Set "macrosPerServing" to null.`
   return `You are a practical, resourceful home cook. You are given the user's current pantry (item names with rough quantities, sometimes per-100g macros) and a few preferences. Propose 2–3 recipes they can make MOSTLY from what they already have.
@@ -54,7 +54,7 @@ Rules:
 - Each recipe must be makeable mostly from the listed pantry items — use what they have.
 - "missingItems" is only for small, common staples (salt, oil, a lemon), never a full second shop. Prefer recipes that need nothing missing.
 - "usesItems" must reference the actual pantry item names provided.
-- Respect the preferences: a given hero ingredient should star in at least one recipe; honour the vibe:
+- Respect the preferences: build around any starred ingredients — feature them across the recipes, but they needn't all appear in every dish; honour the vibe:
   - fast = quick, minimal steps, weeknight.
   - clean = lighter, fresh, whole-food leaning.
   - comfort = hearty, cosy, satisfying.
@@ -183,7 +183,9 @@ export async function generateRecipes(
   const userText =
     `My pantry:\n${pantryList(pantry)}\n\n` +
     `Preferences:\n` +
-    `- Hero ingredient: ${prefs.hero ?? "cook's choice (surprise me)"}\n` +
+    (prefs.heroes.length
+      ? `- Build around these ingredients (use them across the recipes; you needn't cram all into every dish): ${prefs.heroes.join(', ')}.\n`
+      : `- Hero ingredients: cook's choice (surprise me).\n`) +
     `- Vibe: ${prefs.vibe}\n` +
     (prefs.macros ? `- Show macros per serving and lean high-protein.\n` : '') +
     (prefs.useSoon && prefs.useSoon.length
@@ -194,7 +196,7 @@ export async function generateRecipes(
   const recipeModel =
     (await getSetting(RECIPE_MODEL_SETTING)) || DEFAULT_RECIPE_MODEL
   const text = await callMessages({
-    system: recipeSystem(prefs.macros),
+    system: recipeSystem(prefs),
     kind: 'recipe',
     model: recipeModel,
     // 2–3 full recipes (ingredients + steps) blow past ~1500 and truncate the

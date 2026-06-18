@@ -11,7 +11,8 @@ import { RecipeCard } from '../components/RecipeCard'
 import { IconAdd, IconCamera, IconCook } from '../components/Icons'
 import styles from './CookPage.module.css'
 
-const SURPRISE = '__surprise__'
+/** Build around at most this many starred ingredients (soft cap). */
+const MAX_HEROES = 3
 
 // Rotating status lines for the cook wait — makes the 5–10s feel like the app
 // is thinking for you rather than just spinning.
@@ -49,7 +50,7 @@ export function CookPage() {
   const [items, setItems] = useState<PantryItem[] | null>(null)
   const [history, setHistory] = useState<Recipe[]>([])
 
-  const [hero, setHero] = useState<string>(SURPRISE)
+  const [heroes, setHeroes] = useState<string[]>([])
   const [vibe, setVibe] = useState<Vibe>('fast')
   const [macros, setMacros] = useState(false)
   const [useExpiring, setUseExpiring] = useState(
@@ -94,7 +95,7 @@ export function CookPage() {
         setPhase('cooking')
         try {
           const generated = await generateRecipes(confirmed, {
-            hero: null,
+            heroes: [],
             vibe: 'fast',
             macros: false,
             useSoon: soon,
@@ -113,6 +114,16 @@ export function CookPage() {
     })()
   }, [])
 
+  // Multi-select hero: tap to add/remove, soft-capped at MAX_HEROES. The
+  // "Surprise me" chip just clears the list (empty = cook's choice).
+  function toggleHero(name: string) {
+    setHeroes((prev) => {
+      if (prev.includes(name)) return prev.filter((h) => h !== name)
+      if (prev.length >= MAX_HEROES) return prev
+      return [...prev, name]
+    })
+  }
+
   async function cook() {
     if (!items) return
     if (!(await hasApiAccess())) {
@@ -125,7 +136,7 @@ export function CookPage() {
     try {
       const soonNames = expiringItems(items).map((s) => s.item.name)
       const recs = await generateRecipes(items, {
-        hero: hero === SURPRISE ? null : hero,
+        heroes,
         vibe,
         macros,
         useSoon: useExpiring ? soonNames : undefined,
@@ -231,34 +242,38 @@ export function CookPage() {
     )
   }
 
-  const heroes = heroCandidates(items)
   const soonCount = expiringItems(items).length
 
   return (
     <>
       <PageHeader
         title="Cook"
-        subtitle="Two taps and I’ll cook from what you’ve got."
+        subtitle="Tell me what you fancy — I’ll cook from what you’ve got."
       />
 
       <section className={styles.q}>
-        <h2 className={styles.qTitle}>What’s the hero?</h2>
+        <h2 className={styles.qTitle}>Build around…</h2>
+        <p className={styles.hint}>Pick up to {MAX_HEROES}, or surprise me.</p>
         <div className={styles.chips}>
           <button
-            className={`${styles.chip} ${hero === SURPRISE ? styles.chipOn : ''}`}
-            onClick={() => setHero(SURPRISE)}
+            className={`${styles.chip} ${heroes.length === 0 ? styles.chipOn : ''}`}
+            onClick={() => setHeroes([])}
           >
             ✨ Surprise me
           </button>
-          {heroes.map((name) => (
-            <button
-              key={name}
-              className={`${styles.chip} ${hero === name ? styles.chipOn : ''}`}
-              onClick={() => setHero(name)}
-            >
-              {name}
-            </button>
-          ))}
+          {heroCandidates(items).map((name) => {
+            const on = heroes.includes(name)
+            return (
+              <button
+                key={name}
+                className={`${styles.chip} ${on ? styles.chipOn : ''}`}
+                aria-pressed={on}
+                onClick={() => toggleHero(name)}
+              >
+                {name}
+              </button>
+            )
+          })}
         </div>
       </section>
 

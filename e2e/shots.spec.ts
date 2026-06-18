@@ -86,7 +86,7 @@ test.describe(() => {
   test('cook prefs', async ({ page }) => {
     await seedAll(page)
     await page.goto('/app#/cook')
-    await page.getByRole('heading', { name: 'What’s the hero?' }).waitFor()
+    await page.getByRole('heading', { name: 'Build around…' }).waitFor()
     await shoot(page, 'cook-prefs')
   })
 
