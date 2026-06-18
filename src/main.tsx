@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './theme/global.css'
 import { launchHash } from './lib/launchHash'
+import { parseLaunchHash } from './lib/magicLink'
 import { App } from './App'
 import { LandingDeck } from './landing/LandingDeck'
 
@@ -13,9 +14,14 @@ import { LandingDeck } from './landing/LandingDeck'
 const path = window.location.pathname.replace(/\/+$/, '')
 const isApp = path === '/app' || path.startsWith('/app/')
 
-// Phase-5 affordance: surface the captured launch hash in dev for inspection.
-if (import.meta.env.DEV && launchHash) {
-  console.debug('[VibePantry] launch hash captured:', launchHash)
+// Magic-link installer: if the launch hash carries an API key (`#k=…`), strip it
+// from the URL NOW — before any render — so neither the encoded nor the decoded
+// key ever shows in the address bar or browser history. The in-memory
+// `launchHash` snapshot still holds the value for <KeyInstaller>. Guarded on a
+// real `k` param so normal `#/route` hashes are untouched. Never log the hash:
+// the base64 in the link is obfuscation, not security (see lib/magicLink.ts).
+if (parseLaunchHash(launchHash).k !== null) {
+  history.replaceState(null, '', window.location.pathname + window.location.search)
 }
 
 createRoot(document.getElementById('root')!).render(

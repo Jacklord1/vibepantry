@@ -1,0 +1,89 @@
+/* Magic-link key installer — full-screen overlay shown on first load when a
+   setup link carries an API key. Mirrors the CookMode overlay recipe; buttons
+   mirror SettingsPage. z-index sits above CookMode (50) and the toast viewport
+   so it's the topmost surface on a fresh launch. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  background: var(--c-bg);
+  padding: var(--sp-6) var(--sp-4);
+  padding-top: calc(var(--sp-6) + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(var(--sp-6) + var(--safe-bottom));
+  text-align: center;
+}
+
+.panel {
+  width: 100%;
+  max-width: var(--maxw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  font-size: var(--fs-h1);
+  line-height: var(--lh-tight);
+  color: var(--c-text);
+}
+
+.success .title {
+  color: var(--c-herb);
+}
+
+.error .title {
+  color: var(--c-danger);
+}
+
+.body {
+  color: var(--c-text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--sp-2);
+}
+
+/* Buttons mirror SettingsPage.module.css (CSS modules are scoped — can't share). */
+.primary {
+  padding: var(--sp-3) var(--sp-5);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-md);
+}
+
+.primary:hover {
+  background: var(--c-accent-hover);
+}
+
+.primary:active,
+.secondary:active {
+  transform: scale(0.98);
+}
+
+.secondary {
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-bg-elev);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-md);
+  font-weight: var(--fw-medium);
+}
+
+.secondary:hover {
+  background: var(--c-surface-2);
+}

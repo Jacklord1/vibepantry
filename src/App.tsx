@@ -1,5 +1,6 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { ToastProvider } from './components/ToastProvider'
+import { KeyInstaller } from './components/KeyInstaller'
 import { Layout } from './components/Layout'
 import { PantryPage } from './pages/PantryPage'
 import { ItemEditorPage } from './pages/ItemEditorPage'
@@ -14,6 +15,7 @@ export function App() {
   return (
     <HashRouter>
       <ToastProvider>
+        <KeyInstaller />
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<PantryPage />} />
