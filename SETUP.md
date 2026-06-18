@@ -1,8 +1,9 @@
 # Deploying VibePantry (Cloudflare Workers static assets)
 
 VibePantry is live at **https://vibepantry.com** — served by a Cloudflare
-**Worker** (`vibepantry`) with the static build (`dist/`) as its assets. Same
-model as `stwrd-site`. Landing is at `/`, the app at `/app`.
+**Worker** (`vibepantry`) with the static build (`dist/`) as its assets — the
+standard Cloudflare Workers static-assets pattern. Landing is at `/`, the app at
+`/app`.
 
 ## How it's wired
 
@@ -17,17 +18,14 @@ model as `stwrd-site`. Landing is at `/`, the app at `/app`.
 
 ## Deploy
 
-From the NUC (secrets resolved via 1Password):
-
 ```bash
-cd ~/git/vibepantry
 npm run build
-op run --env-file=~/ai/.env.local -- npx wrangler deploy
+npx wrangler deploy
 ```
 
-`wrangler` reads `CLOUDFLARE_API_TOKEN` (the `Edit zone DNS` token — has Workers
-Scripts edit) and `CLOUDFLARE_ACCOUNT_ID` from the env. Deploy takes ~5s; only
-changed assets upload.
+`wrangler` reads `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` from the
+environment — set them however you manage secrets. The token needs Workers Scripts
+edit. Deploy takes ~5s; only changed assets upload.
 
 ## Outstanding: bind `www` (one dashboard step)
 
@@ -51,11 +49,10 @@ Push-to-deploy is live via **GitHub Actions** (`.github/workflows/deploy.yml`):
   release.
 - **Manual:** GitHub → repo → **Actions → Deploy → Run workflow**, or
   `gh workflow run deploy.yml -R Jacklord1/vibepantry`.
-- Repo secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` are set.
-  (Security follow-up: the CI token is currently the broad `Edit zone DNS` token —
-  swap it for a Workers-only least-priv token when convenient.)
+- Set the repo secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (use a
+  Workers-scoped, least-privilege token).
 
-A direct `wrangler deploy` from the NUC (see above) still works any time.
+A direct `wrangler deploy` from your machine (see above) still works any time.
 
 ## Notes
 
