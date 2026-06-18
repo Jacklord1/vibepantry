@@ -18,7 +18,7 @@ async function openLink(page: import('@playwright/test').Page, url: string) {
   await page.goto(url)
 }
 
-test('happy path: installs the key, scrubs the URL, routes to Snap', async ({ page }) => {
+test('happy path: installs the key, scrubs the URL, routes to the intro deck', async ({ page }) => {
   await page.goto(`/app#k=${KEY_B64}&t=${now()}`)
 
   // Themed confirmation shown.
@@ -28,12 +28,14 @@ test('happy path: installs the key, scrubs the URL, routes to Snap', async ({ pa
   expect(page.url()).not.toContain('k=')
   expect(page.url()).not.toContain('VEVTVE')
 
-  // Routes into the app via the confirmation CTA.
-  await page.getByRole('button', { name: 'Snap your pantry' }).click()
-  await expect(page).toHaveURL(/\/app#\/snap$/)
-  await expect(page.getByText(/Snapping needs your Anthropic API key/)).toHaveCount(0)
+  // CTA routes to the intro deck at the ROOT path (full nav, not the in-app
+  // hash router) so first-timers see the landing slides.
+  await page.getByRole('button', { name: 'See how it works' }).click()
+  await expect(page).toHaveURL(/:\d+\/$/)
+  await expect(page.getByRole('heading', { name: 'VibePantry' })).toBeVisible()
+  await expect(page.getByRole('navigation', { name: 'Primary' })).toHaveCount(0)
 
-  // Settings shows the masked key — proving the SAME write path was used.
+  // Key persisted (same origin) — masked in Settings, proving the SAME write path.
   await page.goto('/app#/settings')
   await expect(page.getByText('••••••••Y123')).toBeVisible()
 })

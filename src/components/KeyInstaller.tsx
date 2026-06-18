@@ -78,9 +78,14 @@ export function KeyInstaller() {
     navigate('/')
   }
 
-  function goSnap() {
-    setPhase('idle')
-    navigate('/snap')
+  function goHome() {
+    // Send freshly-onboarded users to the intro deck at the ROOT path `/`, not
+    // into the app. The landing deck lives outside HashRouter (see main.tsx's
+    // path-gated bootstrap: pathname `/` -> <LandingDeck>, `/app` -> <App>), so
+    // a react-router navigate('/') would only change the hash and land on the
+    // in-app Pantry. A real navigation is required. Same origin, so the key
+    // just saved to IndexedDB persists.
+    window.location.assign('/')
   }
 
   async function confirmOverwrite() {
@@ -158,12 +163,12 @@ export function KeyInstaller() {
           <>
             <h1 className={styles.title}>All set</h1>
             <p className={styles.body}>
-              You're all set — your key's saved on this device. Snap your pantry to
-              begin.
+              You're all set — your key's saved on this device. Take a look at how it
+              works, then snap your pantry to begin.
             </p>
             <div className={styles.actions}>
-              <button className={styles.primary} onClick={goSnap} autoFocus>
-                Snap your pantry
+              <button className={styles.primary} onClick={goHome} autoFocus>
+                See how it works
               </button>
             </div>
           </>
