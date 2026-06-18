@@ -5,6 +5,8 @@ import type { PantryItem } from '../types'
 import { putItem } from '../db'
 import { hasApiAccess, MissingApiKeyError } from '../lib/anthropic'
 import { extractItemsFromPhoto } from '../lib/vision'
+import { readImageSize } from '../lib/image'
+import { copyLink, detectEnv, openInRealBrowser } from '../lib/platform'
 import { uuid } from '../lib/id'
 import { useToast } from '../hooks/useToast'
 import { PageHeader } from '../components/PageHeader'
@@ -13,18 +15,50 @@ import type { RowPatch } from '../components/ReviewGrid'
 import { IconCamera, IconCheck, IconClose, IconUpload } from '../components/Icons'
 import styles from './SnapPage.module.css'
 
+// Decode/read at most this many photos at once. Each decode is the memory
+// spike, so a small cap keeps a big multi-select batch from OOM-ing the tab.
+const READ_CONCURRENCY = 2
+
+// Session flag: the user dismissed the in-app-browser wall ("continue anyway").
+const FORCE_KEY = 'vp_snap_force'
+
 type PhotoStatus = 'queued' | 'reading' | 'done' | 'error'
 type Photo = {
   id: string
-  file: File
+  /** Dropped after a successful read to release the original blob. */
+  file?: File
   thumbUrl: string
   status: PhotoStatus
   error?: string
   count?: number
+  sizeBytes: number
+  dims?: { w: number; h: number }
 }
 
 function errMessage(e: unknown): string {
   return e instanceof Error ? e.message : 'Something went wrong reading that photo.'
+}
+
+function fmtSize(bytes: number): string {
+  return bytes >= 1e6
+    ? `${(bytes / 1e6).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(bytes / 1e3))} KB`
+}
+
+/** Run `worker` over `items` with at most `limit` in flight at once. */
+async function runPool<T>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<void>,
+): Promise<void> {
+  let i = 0
+  const runners = Array.from(
+    { length: Math.min(limit, items.length) },
+    async () => {
+      while (i < items.length) await worker(items[i++])
+    },
+  )
+  await Promise.all(runners)
 }
 
 /** Combine case-insensitive same-name rows, joining their quantities. */
@@ -67,6 +101,17 @@ export function SnapPage() {
   const [progress, setProgress] = useState({ done: 0, total: 0 })
   const [accepting, setAccepting] = useState(false)
   const [dragOver, setDragOver] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  // In-app-browser wall: photo decode OOMs in chat-app webviews. Block capture
+  // and push the user into a real browser, with a "continue anyway" escape so a
+  // mis-detected real browser is never locked out.
+  const env = detectEnv()
+  const [forced, setForced] = useState(
+    () =>
+      typeof sessionStorage !== 'undefined' &&
+      sessionStorage.getItem(FORCE_KEY) === '1',
+  )
 
   const cameraRef = useRef<HTMLInputElement>(null)
   const pickerRef = useRef<HTMLInputElement>(null)
@@ -94,7 +139,13 @@ export function SnapPage() {
       if (!file.type.startsWith('image/')) continue
       const thumbUrl = URL.createObjectURL(file)
       urlsRef.current.push(thumbUrl)
-      next.push({ id: uuid(), file, thumbUrl, status: 'queued' })
+      const id = uuid()
+      next.push({ id, file, thumbUrl, status: 'queued', sizeBytes: file.size })
+      // Cheap header read so the tile can show "12 MP · 4.2 MB" BEFORE the read
+      // — visible even if a later decode crashes the tab (remote reporting).
+      void readImageSize(file).then((d) => {
+        if (d) patchPhoto(id, { dims: { w: d.width, h: d.height } })
+      })
     }
     if (next.length) setPhotos((ps) => [...ps, ...next])
   }
@@ -126,24 +177,32 @@ export function SnapPage() {
       ps.map((p) => (p.status === 'queued' ? { ...p, status: 'reading' } : p)),
     )
 
-    await Promise.allSettled(
-      queued.map(async (p) => {
-        try {
-          const items = await extractItemsFromPhoto(p.file, p.id)
-          setReviewItems((prev) => [...prev, ...items])
-          patchPhoto(p.id, { status: 'done', count: items.length })
-        } catch (e) {
-          if (e instanceof MissingApiKeyError) {
-            setGated(true)
-            patchPhoto(p.id, { status: 'queued' })
-          } else {
-            patchPhoto(p.id, { status: 'error', error: errMessage(e) })
-          }
-        } finally {
-          setProgress((pr) => ({ ...pr, done: pr.done + 1 }))
+    // Bounded concurrency — at most READ_CONCURRENCY decodes in flight so a big
+    // batch can't pile full-resolution bitmaps into memory all at once.
+    await runPool(queued, READ_CONCURRENCY, async (p) => {
+      if (!p.file) return
+      try {
+        const items = await extractItemsFromPhoto(p.file, p.id)
+        setReviewItems((prev) => [...prev, ...items])
+        // Read succeeded — drop the original File (frees the blob once its
+        // thumbnail is gone). Kept on error so the photo can be retried.
+        patchPhoto(p.id, {
+          status: 'done',
+          count: items.length,
+          file: undefined,
+          error: undefined,
+        })
+      } catch (e) {
+        if (e instanceof MissingApiKeyError) {
+          setGated(true)
+          patchPhoto(p.id, { status: 'queued' })
+        } else {
+          patchPhoto(p.id, { status: 'error', error: errMessage(e) })
         }
-      }),
-    )
+      } finally {
+        setProgress((pr) => ({ ...pr, done: pr.done + 1 }))
+      }
+    })
     setReading(false)
   }
 
@@ -170,8 +229,76 @@ export function SnapPage() {
     addFiles(e.dataTransfer.files)
   }
 
+  function continueAnyway() {
+    try {
+      sessionStorage.setItem(FORCE_KEY, '1')
+    } catch {
+      // sessionStorage unavailable — still let them through this session.
+    }
+    setForced(true)
+  }
+
+  async function onCopyLink() {
+    setCopied(await copyLink())
+  }
+
   if (gated === null) {
     return <p className={styles.status}>Loading…</p>
+  }
+
+  // In-app-browser wall takes precedence — fix the browser before anything else.
+  if (env.inAppBrowser && !forced) {
+    const realBrowser = env.platform === 'ios' ? 'Safari' : 'Chrome'
+    return (
+      <>
+        <PageHeader title="Snap your pantry" />
+        <div className={styles.wall}>
+          <div className={styles.wallIcon} aria-hidden>
+            🚫
+          </div>
+          <h2 className={styles.wallTitle}>Photo scanning needs a real browser</h2>
+          <p className={styles.wallCopy}>
+            You're in {env.appName ? `${env.appName}'s` : 'an in-app'} browser,
+            which runs out of memory on photos. Open VibePantry in {realBrowser} —
+            or add it to your home screen — and scanning will work properly.
+          </p>
+          <ol className={styles.wallSteps}>
+            {env.platform === 'ios' ? (
+              <>
+                <li>
+                  Tap <strong>•••</strong> or the share button, then{' '}
+                  <strong>Open in Safari</strong>.
+                </li>
+                <li>
+                  Or <strong>Share → Add to Home Screen</strong>.
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  Tap the <strong>•••</strong> menu, then{' '}
+                  <strong>Open in Chrome</strong>.
+                </li>
+                <li>
+                  Or <strong>⋮ → Add to Home screen</strong>.
+                </li>
+              </>
+            )}
+          </ol>
+          <div className={styles.wallActions}>
+            <button className={styles.primary} onClick={() => openInRealBrowser()}>
+              Open in {realBrowser}
+            </button>
+            <button className={styles.secondary} onClick={onCopyLink}>
+              {copied ? 'Link copied ✓' : 'Copy link'}
+            </button>
+          </div>
+          <button className={styles.wallContinue} onClick={continueAnyway}>
+            continue anyway (risky)
+          </button>
+        </div>
+      </>
+    )
   }
 
   if (gated) {
@@ -195,6 +322,9 @@ export function SnapPage() {
   const doneCount = photos.filter((p) => p.status === 'done').length
   const noItemsFound =
     !reading && doneCount > 0 && reviewItems.length === 0 && queuedCount === 0
+  const debug =
+    typeof location !== 'undefined' &&
+    new URLSearchParams(location.search).get('debug') === '1'
 
   return (
     <>
@@ -257,34 +387,46 @@ export function SnapPage() {
 
       {photos.length > 0 && (
         <ul className={styles.thumbs}>
-          {photos.map((p) => (
-            <li key={p.id} className={styles.tile}>
-              <img className={styles.thumb} src={p.thumbUrl} alt="" />
-              <div className={`${styles.badge} ${styles[p.status]}`}>
-                {p.status === 'reading' && <span className={styles.spinner} />}
-                {p.status === 'done' && (
-                  <>
-                    <IconCheck size={13} />
-                    {p.count}
-                  </>
+          {photos.map((p) => {
+            const mp = p.dims ? (p.dims.w * p.dims.h) / 1e6 : null
+            return (
+              <li key={p.id} className={styles.tile}>
+                <img className={styles.thumb} src={p.thumbUrl} alt="" />
+                <p className={styles.tileMeta}>
+                  {mp != null && (
+                    <span className={mp > 24 ? styles.big : undefined}>
+                      {mp.toFixed(mp >= 10 ? 0 : 1)} MP ·{' '}
+                    </span>
+                  )}
+                  {fmtSize(p.sizeBytes)}
+                  {debug && p.dims && ` · ${p.dims.w}×${p.dims.h}`}
+                </p>
+                <div className={`${styles.badge} ${styles[p.status]}`}>
+                  {p.status === 'reading' && <span className={styles.spinner} />}
+                  {p.status === 'done' && (
+                    <>
+                      <IconCheck size={13} />
+                      {p.count}
+                    </>
+                  )}
+                  {p.status === 'queued' && 'queued'}
+                  {p.status === 'error' && '!'}
+                </div>
+                {!reading && (
+                  <button
+                    className={styles.remove}
+                    onClick={() => removePhoto(p.id)}
+                    aria-label="Remove photo"
+                  >
+                    <IconClose size={14} />
+                  </button>
                 )}
-                {p.status === 'queued' && 'queued'}
-                {p.status === 'error' && '!'}
-              </div>
-              {!reading && (
-                <button
-                  className={styles.remove}
-                  onClick={() => removePhoto(p.id)}
-                  aria-label="Remove photo"
-                >
-                  <IconClose size={14} />
-                </button>
-              )}
-              {p.status === 'error' && (
-                <p className={styles.tileError}>{p.error}</p>
-              )}
-            </li>
-          ))}
+                {p.status === 'error' && (
+                  <p className={styles.tileError}>{p.error}</p>
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
 

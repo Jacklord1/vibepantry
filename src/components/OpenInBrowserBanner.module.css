@@ -1,0 +1,77 @@
+/* Prominent, sticky, danger-toned warning bar at the very top of the app shell.
+   Cookbook tokens only. Persistent (no dismiss) — this is the one thing we don't
+   want normies to miss. */
+.banner {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: var(--sp-3) var(--sp-4);
+  background: color-mix(in srgb, var(--c-danger) 20%, var(--c-bg));
+  border-bottom: 1px solid var(--c-danger);
+  box-shadow: var(--shadow-2);
+  backdrop-filter: blur(6px);
+}
+
+.text {
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text);
+  margin-bottom: var(--sp-2);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.primary {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--c-danger);
+  color: #fff;
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+}
+
+.primary:active {
+  transform: scale(0.98);
+}
+
+.secondary {
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--r-md);
+  background: var(--c-bg-elev);
+  color: var(--c-text);
+  border: 1px solid var(--c-border-strong);
+  font-weight: var(--fw-medium);
+  font-size: var(--fs-sm);
+}
+
+.secondary:active {
+  transform: scale(0.98);
+}
+
+.how {
+  padding: var(--sp-2) var(--sp-3);
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-medium);
+  text-decoration: underline;
+}
+
+.steps {
+  margin: var(--sp-3) 0 0;
+  padding-left: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text);
+}
+
+.steps li {
+  list-style: decimal;
+}

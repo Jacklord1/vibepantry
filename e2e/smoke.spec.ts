@@ -56,3 +56,44 @@ test('settings saves then clears an API key', async ({ page }) => {
   await expect(page.getByText('Key removed.')).toBeVisible()
   await expect(page.getByPlaceholder('sk-ant-…')).toBeVisible()
 })
+
+test('no in-app-browser banner in a normal mobile browser', async ({ page }) => {
+  // Default project UA is a real iOS Safari UA — must NOT trip the wall/banner.
+  await page.goto('/app#/snap')
+  await expect(page.getByText("won't work properly")).toHaveCount(0)
+  await expect(
+    page.getByRole('heading', { name: 'Photo scanning needs a real browser' }),
+  ).toHaveCount(0)
+})
+
+// A chat-app in-app browser (Instagram) — photo decode OOMs there, so we wall
+// off Snap and push the user into a real browser, with an escape hatch.
+test.describe('in-app browser wall', () => {
+  test.use({
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Instagram 302.0.0.0',
+  })
+
+  test('shows the banner + Snap wall, with a continue-anyway escape', async ({
+    page,
+  }) => {
+    await page.goto('/app')
+    // App-wide danger banner names the app and offers a real-browser escape.
+    await expect(page.getByRole('alert')).toContainText("won't work properly")
+    await expect(page.getByRole('alert')).toContainText('Instagram')
+
+    // Snap itself is fully walled off — no capture UI.
+    await page.goto('/app#/snap')
+    await expect(
+      page.getByRole('heading', { name: 'Photo scanning needs a real browser' }),
+    ).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Take photo' })).toHaveCount(0)
+
+    // The escape dismisses the wall (never lock out a real browser); what's
+    // behind it (here, the key gate) is no longer walled off.
+    await page.getByRole('button', { name: /continue anyway/ }).click()
+    await expect(
+      page.getByRole('heading', { name: 'Photo scanning needs a real browser' }),
+    ).toHaveCount(0)
+  })
+})

@@ -225,4 +225,30 @@ test.describe(() => {
     await page.getByRole('button', { name: /Add 4 items to pantry/ }).waitFor()
     await shoot(page, 'review-grid')
   })
+
+  // A multi-photo batch must all flow through the bounded concurrency pool.
+  test('reads a multi-photo batch through the pool', async ({ page }) => {
+    const mockUrl = await seedProxyEndpoint(page)
+    await page.route(`**${mockUrl}`, async (route) => {
+      await new Promise((r) => setTimeout(r, 200)) // hold so >1 are in flight
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ content: [{ type: 'text', text: VISION_ITEMS }] }),
+      })
+    })
+    await page.goto('/app#/snap')
+    await page.locator('input[type="file"]:not([capture])').setInputFiles(
+      [1, 2, 3].map((n) => ({
+        name: `shelf-${n}.png`,
+        mimeType: 'image/png',
+        buffer: TINY_PNG,
+      })),
+    )
+    await page.getByRole('button', { name: /^Read 3 photos$/ }).click()
+    // 4 items per photo × 3 photos = 12 — proves all three read successfully.
+    await page
+      .getByRole('button', { name: /Add 12 items to pantry/ })
+      .waitFor()
+  })
 })

@@ -4,7 +4,9 @@ import { defineConfig, devices } from '@playwright/test'
 // Chromium. The primary surface is the phone, so the default project is a
 // 390×844 viewport (iPhone 12/13/14 logical size). A 360-wide "small phone"
 // project guards the tightest layouts.
-const PORT = 5173
+// Port is env-overridable so parallel worktrees/threads don't collide on one
+// dev server (defaults to 5173 for CI + the usual single-checkout case).
+const PORT = Number(process.env.E2E_PORT) || 5173
 const baseURL = `http://localhost:${PORT}`
 
 export default defineConfig({

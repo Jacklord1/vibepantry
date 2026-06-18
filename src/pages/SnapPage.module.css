@@ -235,6 +235,97 @@
   background: color-mix(in srgb, var(--c-danger) 88%, transparent);
 }
 
+/* Per-photo diagnostics — a subtle top strip showing megapixels + file size.
+   Rendered before the read so it survives a tab crash (remote reporting). */
+.tileMeta {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 2px var(--sp-2);
+  padding-right: 36px; /* clear the remove button */
+  font-size: 10px;
+  line-height: 1.4;
+  color: var(--c-text);
+  background: color-mix(in srgb, var(--c-bg) 70%, transparent);
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tileMeta .big {
+  color: var(--c-danger);
+  font-weight: var(--fw-semibold);
+}
+
+/* ---- in-app-browser wall (photo decode OOMs in chat-app webviews) ---- */
+.wall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-danger);
+  border-radius: var(--r-lg);
+}
+
+.wallIcon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.wallTitle {
+  font-size: var(--fs-h1);
+}
+
+.wallCopy {
+  color: var(--c-text-muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+}
+
+.wallSteps {
+  align-self: stretch;
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  text-align: left;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--c-text);
+  background: var(--c-bg-elev);
+  border-radius: var(--r-md);
+}
+
+.wallSteps li {
+  list-style: decimal;
+}
+
+.wallActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.wallContinue {
+  margin-top: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  color: var(--c-text-faint);
+  font-size: var(--fs-sm);
+  text-decoration: underline;
+}
+
+.wallContinue:hover {
+  color: var(--c-text-muted);
+}
+
 /* ---- read button ---- */
 .read {
   display: flex;
