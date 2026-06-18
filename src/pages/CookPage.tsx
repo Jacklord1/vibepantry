@@ -13,6 +13,15 @@ import styles from './CookPage.module.css'
 
 const SURPRISE = '__surprise__'
 
+// Rotating status lines for the cook wait — makes the 5–10s feel like the app
+// is thinking for you rather than just spinning.
+const COOKING_PATTER = [
+  'Rifling through your shelves…',
+  'Pairing things that belong together…',
+  'Balancing flavour and effort…',
+  'Plating up a few ideas…',
+]
+
 /** Up to 8 hero candidates, proteins/dairy first. */
 function heroCandidates(items: PantryItem[]): string[] {
   const priority = new Set(['meat_seafood', 'dairy_eggs'])
@@ -42,6 +51,17 @@ export function CookPage() {
   const [phase, setPhase] = useState<'prefs' | 'cooking' | 'options'>('prefs')
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [patterIdx, setPatterIdx] = useState(0)
+
+  // Cycle the chef patter while cooking (index reset happens in cook()).
+  useEffect(() => {
+    if (phase !== 'cooking') return
+    const t = setInterval(
+      () => setPatterIdx((i) => (i + 1) % COOKING_PATTER.length),
+      2200,
+    )
+    return () => clearInterval(t)
+  }, [phase])
 
   useEffect(() => {
     void (async () => {
@@ -63,6 +83,7 @@ export function CookPage() {
       return
     }
     setError(null)
+    setPatterIdx(0)
     setPhase('cooking')
     try {
       const soonNames = expiringItems(items).map((s) => s.item.name)
@@ -127,10 +148,23 @@ export function CookPage() {
   if (phase === 'cooking') {
     return (
       <>
-        <PageHeader title="Cook" />
-        <div className={styles.cooking}>
-          <span className={styles.spinner} />
-          <p>Cooking up options…</p>
+        <PageHeader title="Cooking up options" subtitle={COOKING_PATTER[patterIdx]} wide />
+        <div
+          className={styles.options}
+          aria-busy="true"
+          aria-label="Generating recipes"
+        >
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={styles.skeleton} aria-hidden>
+              <div className={`${styles.sk} ${styles.skTitle}`} />
+              <div className={`${styles.sk} ${styles.skLine}`} />
+              <div className={`${styles.sk} ${styles.skLineShort}`} />
+              <div className={styles.skMeta}>
+                <div className={`${styles.sk} ${styles.skPill}`} />
+                <div className={`${styles.sk} ${styles.skPill}`} />
+              </div>
+            </div>
+          ))}
         </div>
       </>
     )

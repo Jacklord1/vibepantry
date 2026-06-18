@@ -1,5 +1,40 @@
 import { test, type Page } from '@playwright/test'
-import { seedAll, seedProxyEndpoint, TINY_PNG } from './seed'
+import { seedAll, seedProxyEndpoint, writeStore, sampleItems, TINY_PNG } from './seed'
+
+// Three canned recipes for the cook-reveal mock (valid parse shape).
+const RECIPES_JSON = JSON.stringify({
+  recipes: [
+    {
+      title: 'Smoky chickpea & spinach skillet',
+      blurb: 'A one-pan weeknight dinner that leans on what you already have.',
+      usesItems: ['Tinned chickpeas', 'Baby spinach', 'Smoked paprika'],
+      missingItems: ['Lemon'],
+      servings: 2, timeMinutes: 25,
+      ingredients: [{ name: 'Tinned chickpeas', amount: '2 cans' }],
+      steps: ['Soften the onion.', 'Add chickpeas and paprika.', 'Wilt the spinach.'],
+      macrosPerServing: { kcal: 410, protein_g: 18, carbs_g: 52, fat_g: 14 },
+      tags: ['fast', 'one-pan', 'high-protein'],
+    },
+    {
+      title: 'Garlic butter chicken & rice',
+      blurb: 'Cosy, golden, and on the table in half an hour.',
+      usesItems: ['Chicken thighs', 'Basmati rice', 'Garlic'],
+      missingItems: [], servings: 3, timeMinutes: 30,
+      ingredients: [{ name: 'Chicken thighs', amount: '1kg' }],
+      steps: ['Sear the thighs.', 'Toast the rice.', 'Simmer together.'],
+      macrosPerServing: null, tags: ['comfort'],
+    },
+    {
+      title: 'Spinach & cheddar frittata',
+      blurb: 'Fridge-clearing eggs that work for any meal.',
+      usesItems: ['Free-range eggs', 'Cheddar', 'Baby spinach'],
+      missingItems: [], servings: 4, timeMinutes: 20,
+      ingredients: [{ name: 'Free-range eggs', amount: '8' }],
+      steps: ['Beat the eggs.', 'Fold in spinach and cheddar.', 'Bake until set.'],
+      macrosPerServing: null, tags: ['clean', 'high-protein'],
+    },
+  ],
+})
 
 // A canned vision response: two items plus a same-named duplicate (enables
 // "Merge duplicates") and one carrying macros (shows the macros badge).
@@ -74,6 +109,27 @@ test.describe(() => {
     await page.goto('/app#/settings')
     await page.getByRole('heading', { name: 'Anthropic API key' }).waitFor()
     await shoot(page, 'settings')
+  })
+
+  test('cook reveal', async ({ page }) => {
+    const mockUrl = await seedProxyEndpoint(page)
+    await writeStore(page, 'items', sampleItems())
+    await page.route(`**${mockUrl}`, async (route) => {
+      await new Promise((r) => setTimeout(r, 1500)) // hold so the skeleton shows
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ content: [{ type: 'text', text: RECIPES_JSON }] }),
+      })
+    })
+    await page.goto('/app#/cook')
+    await page.getByRole('button', { name: 'Cook up options' }).click()
+    await page.getByRole('heading', { name: 'Cooking up options' }).waitFor()
+    await page.locator('[aria-busy="true"]').waitFor()
+    await shoot(page, 'cook-cooking')
+    await page.getByRole('heading', { name: 'Pick a recipe' }).waitFor()
+    await page.waitForTimeout(400) // let the stagger settle for a clean shot
+    await shoot(page, 'cook-options')
   })
 
   test('undo toast', async ({ page }) => {

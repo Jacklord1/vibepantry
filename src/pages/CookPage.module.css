@@ -261,6 +261,92 @@
   }
 }
 
+/* The real recipe cards (RecipeCard renders a <button>) fade up, lightly
+   staggered, so the results "plate up" rather than snapping in. Scoped to
+   buttons so the loading skeletons (divs) appear instantly. Reduced-motion
+   zeroes it. */
+.options > button {
+  animation: optionIn var(--t-med) both;
+}
+
+.options > button:nth-child(2) {
+  animation-delay: 70ms;
+}
+
+.options > button:nth-child(3) {
+  animation-delay: 140ms;
+}
+
+@keyframes optionIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- cook reveal: shimmering skeleton cards while the recipes generate ---- */
+.skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+}
+
+.sk {
+  border-radius: var(--r-sm);
+  background: linear-gradient(
+    90deg,
+    var(--c-surface-2) 25%,
+    var(--c-border-strong) 37%,
+    var(--c-surface-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+.skTitle {
+  height: 1.25rem;
+  width: 70%;
+}
+
+.skLine {
+  height: 0.85rem;
+  width: 100%;
+}
+
+.skLineShort {
+  height: 0.85rem;
+  width: 45%;
+}
+
+.skMeta {
+  display: flex;
+  gap: var(--sp-2);
+  margin-top: var(--sp-1);
+}
+
+.skPill {
+  height: 0.85rem;
+  width: 64px;
+  border-radius: var(--r-pill);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
 .again {
   display: block;
   margin: var(--sp-5) auto 0;

@@ -6,7 +6,7 @@ import type { PantryItem, Recipe } from '../src/types'
 // straight into it with the native IndexedDB API and reload to pick them up.
 
 /** Wait for the app shell + DB to exist, then write records into a store. */
-async function writeStore(
+export async function writeStore(
   page: Page,
   store: 'items' | 'recipes' | 'settings',
   records: unknown[],
