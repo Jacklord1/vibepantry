@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
+  flex-wrap: wrap;
   padding: var(--sp-3) var(--sp-4);
   margin-bottom: var(--sp-4);
   background: var(--c-accent-soft);
@@ -11,6 +12,40 @@
   font-size: var(--fs-sm);
   font-weight: var(--fw-medium);
   color: var(--c-text);
+}
+
+.bannerText {
+  flex: 1;
+  min-width: 55%;
+}
+
+.bannerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+/* The amber pill that turns "you have expiring food" into "cook it now". */
+.cookSoon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-pill);
+  background: var(--c-accent);
+  color: var(--c-text-on-accent);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  transition: background var(--t-fast);
+}
+
+.cookSoon:hover {
+  background: var(--c-accent-hover);
+}
+
+.cookSoon:active {
+  transform: scale(0.97);
 }
 
 .dismiss {

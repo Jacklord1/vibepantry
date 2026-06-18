@@ -115,6 +115,7 @@ export function PantryPage() {
           {!q && soonCount > 0 && !bannerDismissed && (
             <UseSoonBanner
               count={soonCount}
+              onCook={() => navigate('/cook', { state: { cookExpiring: true } })}
               onDismiss={() => setBannerDismissed(true)}
             />
           )}

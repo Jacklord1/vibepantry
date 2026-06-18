@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import type { PantryItem, Recipe } from '../types'
 import { getAllItems, getAllRecipes, saveRecipes } from '../db'
 import { hasApiAccess } from '../lib/anthropic'
@@ -40,6 +40,11 @@ function heroCandidates(items: PantryItem[]): string[] {
 
 export function CookPage() {
   const navigate = useNavigate()
+  const location = useLocation()
+  // Did we arrive via the pantry's "Cook tonight" shortcut? (captured once)
+  const cookTonightRef = useRef(
+    (location.state as { cookExpiring?: boolean } | null)?.cookExpiring ?? false,
+  )
   const [gated, setGated] = useState<boolean | null>(null)
   const [items, setItems] = useState<PantryItem[] | null>(null)
   const [history, setHistory] = useState<Recipe[]>([])
@@ -47,7 +52,9 @@ export function CookPage() {
   const [hero, setHero] = useState<string>(SURPRISE)
   const [vibe, setVibe] = useState<Vibe>('fast')
   const [macros, setMacros] = useState(false)
-  const [useExpiring, setUseExpiring] = useState(false)
+  const [useExpiring, setUseExpiring] = useState(
+    () => (location.state as { cookExpiring?: boolean } | null)?.cookExpiring ?? false,
+  )
   const [phase, setPhase] = useState<'prefs' | 'cooking' | 'options'>('prefs')
   const [recipes, setRecipes] = useState<Recipe[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -71,8 +78,38 @@ export function CookPage() {
         getAllRecipes(),
       ])
       setGated(!access)
-      setItems(all.filter((i) => i.confirmed))
+      const confirmed = all.filter((i) => i.confirmed)
+      setItems(confirmed)
       setHistory(sortHistory(recs))
+
+      // One-tap "Cook tonight" from the pantry: auto-generate straight away,
+      // biased to soon-to-expire items, with default prefs (surprise / fast).
+      const soon = expiringItems(confirmed).map((s) => s.item.name)
+      if (
+        cookTonightRef.current &&
+        access &&
+        confirmed.length > 0 &&
+        soon.length > 0
+      ) {
+        setPhase('cooking')
+        try {
+          const generated = await generateRecipes(confirmed, {
+            hero: null,
+            vibe: 'fast',
+            macros: false,
+            useSoon: soon,
+          })
+          await saveRecipes(generated)
+          setRecipes(generated)
+          setHistory((prev) => sortHistory([...generated, ...prev]))
+          setPhase('options')
+        } catch (e) {
+          setError(
+            e instanceof Error ? e.message : 'Something went wrong cooking.',
+          )
+          setPhase('prefs')
+        }
+      }
     })()
   }, [])
 

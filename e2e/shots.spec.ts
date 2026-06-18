@@ -132,6 +132,25 @@ test.describe(() => {
     await shoot(page, 'cook-options')
   })
 
+  test('cook tonight', async ({ page }) => {
+    const mockUrl = await seedProxyEndpoint(page)
+    await writeStore(page, 'items', sampleItems())
+    await page.route(`**${mockUrl}`, async (route) => {
+      await new Promise((r) => setTimeout(r, 800))
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ content: [{ type: 'text', text: RECIPES_JSON }] }),
+      })
+    })
+    await page.goto('/app')
+    await page.getByRole('button', { name: 'Cook tonight' }).click()
+    // One tap auto-cooks straight to options.
+    await page.getByRole('heading', { name: 'Pick a recipe' }).waitFor()
+    await page.waitForTimeout(400)
+    await shoot(page, 'cook-tonight')
+  })
+
   test('undo toast', async ({ page }) => {
     await seedAll(page)
     await page.goto('/app')

@@ -1,29 +1,40 @@
 import type { PantryItem } from '../types'
 import { expiryLabel, expiringItems } from '../lib/expiry'
-import { IconClose } from './Icons'
+import { IconClose, IconCook } from './Icons'
 import styles from './UseSoon.module.css'
 
-/** On-open reminder banner — items expiring within 3 days. */
+/** On-open reminder banner — items expiring within 3 days, with a one-tap
+    shortcut into the cook flow biased to use them tonight. */
 export function UseSoonBanner({
   count,
+  onCook,
   onDismiss,
 }: {
   count: number
+  onCook: () => void
   onDismiss: () => void
 }) {
   return (
     <div className={styles.banner} role="status">
-      <span>
-        {count} item{count === 1 ? '' : 's'} expiring within 3 days — cook them
-        soon.
+      <span className={styles.bannerText}>
+        <strong>
+          {count} item{count === 1 ? '' : 's'}
+        </strong>{' '}
+        expiring within 3 days.
       </span>
-      <button
-        className={styles.dismiss}
-        onClick={onDismiss}
-        aria-label="Dismiss reminder"
-      >
-        <IconClose size={16} />
-      </button>
+      <div className={styles.bannerActions}>
+        <button className={styles.cookSoon} onClick={onCook}>
+          <IconCook size={16} />
+          Cook tonight
+        </button>
+        <button
+          className={styles.dismiss}
+          onClick={onDismiss}
+          aria-label="Dismiss reminder"
+        >
+          <IconClose size={16} />
+        </button>
+      </div>
     </div>
   )
 }
