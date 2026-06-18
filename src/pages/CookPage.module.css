@@ -117,6 +117,17 @@
   font-weight: var(--fw-semibold);
 }
 
+/* Meal type carries six options — too many for one phone row, so wrap to a
+   tidy 3-per-row grid. Only this control wraps; the 3-up Vibe segment is
+   untouched. */
+.segmentWrap {
+  flex-wrap: wrap;
+}
+
+.segmentWrap .seg {
+  flex: 1 0 calc(33.333% - var(--sp-1));
+}
+
 /* ---- toggles ---- */
 .toggleRow {
   display: flex;

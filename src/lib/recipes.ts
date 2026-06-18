@@ -5,6 +5,7 @@ import {
   RECIPE_MODEL_SETTING,
 } from './anthropic'
 import { getSetting } from '../db'
+import { mealTypeLabel, type MealType } from './cookPrefs'
 import { extractJsonObject } from './json'
 import { uuid } from './id'
 
@@ -17,6 +18,8 @@ export type RecipePrefs = {
   /** Pantry item names to build around. Empty = "surprise me". Soft-cap ~3. */
   heroes: string[]
   vibe: Vibe
+  /** Which meal these recipes are for; 'any' = no constraint. */
+  mealType: MealType
   /** Show macros per serving + lean high-protein. */
   macros: boolean
   /** Names of soon-to-expire items to prioritise (optional). */
@@ -33,6 +36,10 @@ function recipeSystem(prefs: RecipePrefs): string {
   const macroRule = prefs.macros
     ? `- The user wants macros: set "macrosPerServing" to a best-estimate object { "kcal": number, "protein_g": number, "carbs_g": number, "fat_g": number } per serving. Lean toward higher-protein recipes and add a "high-protein" tag where it genuinely fits. Where a pantry item lists per-100g macros, use them to sharpen your estimate.`
     : `- Set "macrosPerServing" to null.`
+  const mealRule =
+    prefs.mealType !== 'any'
+      ? `\n- Every recipe must suit ${mealTypeLabel(prefs.mealType).toLowerCase()} — propose only ${mealTypeLabel(prefs.mealType).toLowerCase()} dishes.`
+      : ''
   return `You are a practical, resourceful home cook. You are given the user's current pantry (item names with rough quantities, sometimes per-100g macros) and a few preferences. Propose 2–3 recipes they can make MOSTLY from what they already have.
 
 Return ONLY a JSON object of this exact shape — no prose, no explanation, no markdown code fences:
@@ -59,7 +66,7 @@ Rules:
   - clean = lighter, fresh, whole-food leaning.
   - comfort = hearty, cosy, satisfying.
 - If asked to prioritise soon-to-expire items, make sure most recipes use them.
-- Keep "steps" concise and in order.
+- Keep "steps" concise and in order.${mealRule}
 ${macroRule}
 - Return only the JSON object.`
 }
@@ -187,6 +194,9 @@ export async function generateRecipes(
       ? `- Build around these ingredients (use them across the recipes; you needn't cram all into every dish): ${prefs.heroes.join(', ')}.\n`
       : `- Hero ingredients: cook's choice (surprise me).\n`) +
     `- Vibe: ${prefs.vibe}\n` +
+    (prefs.mealType !== 'any'
+      ? `- Meal: ${mealTypeLabel(prefs.mealType)} only.\n`
+      : '') +
     (prefs.macros ? `- Show macros per serving and lean high-protein.\n` : '') +
     (prefs.useSoon && prefs.useSoon.length
       ? `- Prioritise using these soon-to-expire items: ${prefs.useSoon.join(', ')}.\n`

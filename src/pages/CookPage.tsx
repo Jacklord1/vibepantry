@@ -5,6 +5,7 @@ import { getAllItems, getAllRecipes, saveRecipes } from '../db'
 import { hasApiAccess } from '../lib/anthropic'
 import { generateRecipes, VIBES } from '../lib/recipes'
 import type { Vibe } from '../lib/recipes'
+import { MEAL_TYPES, type MealType } from '../lib/cookPrefs'
 import { expiringItems } from '../lib/expiry'
 import { PageHeader } from '../components/PageHeader'
 import { RecipeCard } from '../components/RecipeCard'
@@ -51,6 +52,7 @@ export function CookPage() {
   const [history, setHistory] = useState<Recipe[]>([])
 
   const [heroes, setHeroes] = useState<string[]>([])
+  const [mealType, setMealType] = useState<MealType>('any')
   const [vibe, setVibe] = useState<Vibe>('fast')
   const [macros, setMacros] = useState(false)
   const [useExpiring, setUseExpiring] = useState(
@@ -96,6 +98,7 @@ export function CookPage() {
         try {
           const generated = await generateRecipes(confirmed, {
             heroes: [],
+            mealType: 'any',
             vibe: 'fast',
             macros: false,
             useSoon: soon,
@@ -137,6 +140,7 @@ export function CookPage() {
       const soonNames = expiringItems(items).map((s) => s.item.name)
       const recs = await generateRecipes(items, {
         heroes,
+        mealType,
         vibe,
         macros,
         useSoon: useExpiring ? soonNames : undefined,
@@ -274,6 +278,22 @@ export function CookPage() {
               </button>
             )
           })}
+        </div>
+      </section>
+
+      <section className={styles.q}>
+        <h2 className={styles.qTitle}>Which meal?</h2>
+        <div className={`${styles.segment} ${styles.segmentWrap}`}>
+          {MEAL_TYPES.map((m) => (
+            <button
+              key={m.value}
+              className={`${styles.seg} ${mealType === m.value ? styles.segOn : ''}`}
+              aria-pressed={mealType === m.value}
+              onClick={() => setMealType(m.value)}
+            >
+              {m.label}
+            </button>
+          ))}
         </div>
       </section>
 
