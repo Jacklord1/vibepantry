@@ -24,7 +24,7 @@ const MAX_EDGE = 1568
  * HEIC on a browser without HEIC support) so one bad photo doesn't sink a batch.
  */
 export async function downscaleToBase64(
-  file: File,
+  file: Blob,
   maxEdge = MAX_EDGE,
 ): Promise<EncodedImage> {
   const size = await readImageSize(file)
@@ -127,7 +127,7 @@ function canvasToJpegBase64(canvas: HTMLCanvasElement): Promise<string> {
  * GIF, …) so the caller falls back to a measure-by-decode.
  */
 export async function readImageSize(
-  file: File,
+  file: Blob,
 ): Promise<{ width: number; height: number } | null> {
   const buf = await file.slice(0, 65536).arrayBuffer()
   const v = new DataView(buf)
@@ -208,7 +208,7 @@ type Decoded = {
 }
 
 /** Full decode via createImageBitmap, falling back to an <img> element. */
-async function decode(file: File): Promise<Decoded> {
+async function decode(file: Blob): Promise<Decoded> {
   try {
     const bitmap = await createImageBitmap(file, {
       imageOrientation: 'from-image',
@@ -231,7 +231,7 @@ async function decode(file: File): Promise<Decoded> {
       el.onerror = () =>
         reject(
           new Error(
-            `Couldn't read "${file.name || 'that image'}" — try a JPEG or PNG.`,
+            `Couldn't read "${(file as File).name || 'that image'}" — try a JPEG or PNG.`,
           ),
         )
       el.src = url

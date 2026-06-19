@@ -95,7 +95,7 @@ export function parseVisionResponse(text: string): RawItem[] {
  * (confirmed:false until the user accepts them from the review grid).
  */
 export async function extractItemsFromPhoto(
-  file: File,
+  file: Blob,
   photoId: string,
 ): Promise<PantryItem[]> {
   const img = await downscaleToBase64(file)

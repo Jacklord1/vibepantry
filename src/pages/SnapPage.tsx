@@ -25,8 +25,9 @@ const FORCE_KEY = 'vp_snap_force'
 type PhotoStatus = 'queued' | 'reading' | 'done' | 'error'
 type Photo = {
   id: string
-  /** Dropped after a successful read to release the original blob. */
-  file?: File
+  /** In-memory snapshot of the captured bytes (see addFiles). Dropped after a
+   *  successful read to release it. */
+  src?: Blob
   thumbUrl: string
   status: PhotoStatus
   error?: string
@@ -132,22 +133,50 @@ export function SnapPage() {
     }
   }, [])
 
-  function addFiles(list: FileList | null) {
+  // Snapshot each picked file's bytes into memory IMMEDIATELY. On Android a
+  // camera-captured File is backed by a content:// reference the OS can reclaim
+  // before we lazily read it at "Read" time — surfacing as a NotReadableError
+  // ("the requested file could not be read…") or a low-memory abort. Copying the
+  // bytes now, while the reference is fresh, makes every later read (size probe,
+  // decode, thumbnail, retry) hit a stable in-memory Blob instead. The reads are
+  // kicked off synchronously so they race the reclaim before the input is reset.
+  async function addFiles(list: FileList | null) {
     if (!list) return
+    const files = Array.from(list).filter((f) => f.type.startsWith('image/'))
+    if (!files.length) return
+
+    const snaps = await Promise.all(
+      files.map(async (file) => {
+        try {
+          const buf = await file.arrayBuffer()
+          return new Blob([buf], { type: file.type || 'image/jpeg' })
+        } catch {
+          return null // reference was already gone — nothing we can read
+        }
+      }),
+    )
+
     const next: Photo[] = []
-    for (const file of Array.from(list)) {
-      if (!file.type.startsWith('image/')) continue
-      const thumbUrl = URL.createObjectURL(file)
+    for (const blob of snaps) {
+      if (!blob) continue
+      const thumbUrl = URL.createObjectURL(blob)
       urlsRef.current.push(thumbUrl)
       const id = uuid()
-      next.push({ id, file, thumbUrl, status: 'queued', sizeBytes: file.size })
+      next.push({ id, src: blob, thumbUrl, status: 'queued', sizeBytes: blob.size })
       // Cheap header read so the tile can show "12 MP · 4.2 MB" BEFORE the read
       // — visible even if a later decode crashes the tab (remote reporting).
-      void readImageSize(file).then((d) => {
+      void readImageSize(blob).then((d) => {
         if (d) patchPhoto(id, { dims: { w: d.width, h: d.height } })
       })
     }
     if (next.length) setPhotos((ps) => [...ps, ...next])
+
+    const failed = snaps.filter((s) => s === null).length
+    if (failed) {
+      toast({
+        message: `Couldn't read ${failed} photo${failed === 1 ? '' : 's'} — try snapping again.`,
+      })
+    }
   }
 
   function removePhoto(id: string) {
@@ -180,16 +209,16 @@ export function SnapPage() {
     // Bounded concurrency — at most READ_CONCURRENCY decodes in flight so a big
     // batch can't pile full-resolution bitmaps into memory all at once.
     await runPool(queued, READ_CONCURRENCY, async (p) => {
-      if (!p.file) return
+      if (!p.src) return
       try {
-        const items = await extractItemsFromPhoto(p.file, p.id)
+        const items = await extractItemsFromPhoto(p.src, p.id)
         setReviewItems((prev) => [...prev, ...items])
-        // Read succeeded — drop the original File (frees the blob once its
+        // Read succeeded — drop the in-memory snapshot (frees it once its
         // thumbnail is gone). Kept on error so the photo can be retried.
         patchPhoto(p.id, {
           status: 'done',
           count: items.length,
-          file: undefined,
+          src: undefined,
           error: undefined,
         })
       } catch (e) {
