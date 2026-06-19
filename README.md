@@ -17,14 +17,14 @@ never leaves your browser.**
 
 ## Why it's different
 
-- 🗄️ **Local-first.** Your pantry, settings, and recipe history live in
+- **Local-first.** Your pantry, settings, and recipe history live in
   IndexedDB on your device. No accounts, no server, no cloud sync.
-- 🔑 **Bring your own key.** Your Anthropic API key is stored only in your
+- **Bring your own key.** Your Anthropic API key is stored only in your
   browser and is only ever sent to `api.anthropic.com` (or your own proxy — see
   below). It's never uploaded anywhere else and never committed to the repo.
-- 🧱 **Pure static build.** No backend to stand up. Clone, build, and serve
+- **Pure static build.** No backend to stand up. Clone, build, and serve
   `dist/` on anything.
-- 🍳 **Catalogue so it can cook for you** — the pantry is a means to the recipe,
+- **Catalogue so it can cook for you** — the pantry is a means to the recipe,
   never the product itself.
 
 ## A look around
